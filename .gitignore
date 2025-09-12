@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.DS_Store
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+.jupyter_ystore.db
+
+Plan.md
+
+*.ipynb
