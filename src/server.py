@@ -142,7 +142,7 @@ async def list_cell(
     
     ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
     async with NbModelClient(ws_url) as notebook: 
-        table = list_cell_basic(notebook)
+        table = list_cell_basic(notebook, with_count=True)
     return table
 
 @mcp.tool(tags={"core","cell","read_cell"})
