@@ -1,7 +1,7 @@
 [project]
 name = "jupyter-mcp"
 version = "0.1.0"
-description = "Add your description here"
+description = "jupyter mcp server"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

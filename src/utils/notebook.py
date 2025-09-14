@@ -1,7 +1,7 @@
 from jupyter_nbmodel_client import NbModelClient
 from .formatter import format_table
 
-def list_notebook_cell_basic(notebook: NbModelClient) -> str:
+def list_cell_basic(notebook: NbModelClient) -> str:
     ydoc = notebook._doc
     total_cell = len(ydoc._ycells)
     
@@ -14,7 +14,7 @@ def list_notebook_cell_basic(notebook: NbModelClient) -> str:
         cell = ydoc.get_cell(i)
         content_list = cell['source'].split("\n")
         if len(content_list) > 1:
-            content = content_list[0] + "..."
+            content = content_list[0] + "...(Full Content In Cell)"
         else:
             content = cell['source']
         rows.append([i, cell['cell_type'], content])

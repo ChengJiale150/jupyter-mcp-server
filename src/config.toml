@@ -1,0 +1,7 @@
+# 基础配置
+[basic]
+# 是否允许返回图片数据(Base64编码)
+ALLOW_IMG = true
+
+
+

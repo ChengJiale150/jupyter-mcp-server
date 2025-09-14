@@ -1,14 +1,11 @@
 from fastmcp import FastMCP
-import json, asyncio, re, base64
+import asyncio
 from typing import Annotated, Literal
-from pathlib import Path
 from fastmcp.utilities.types import Image
 
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
-from utils.notebook import list_notebook_cell_basic
-from utils.cell import Cell
-from utils.formatter import format_table
+from utils import list_cell_basic, Cell, format_table
 
 mcp = FastMCP(name="Jupyter-MCP-Server", version="1.0.0")
 
@@ -16,17 +13,20 @@ mcp = FastMCP(name="Jupyter-MCP-Server", version="1.0.0")
 kernel_manager = {}
 
 #===========================================
-# 内核管理模块(3个)
+# Notebook管理模块(3个)
 #===========================================
-@mcp.tool()
+@mcp.tool(tags={"core","notebook","connect_notebook"})
 async def connect_notebook(
     server_url: Annotated[str, "Jupyter服务启动的URL地址"], 
     token: Annotated[str, "认证Token"], 
-    project_path: Annotated[Path, "Jupyter项目启动路径(绝对路径)"],
-    notebook_name: Annotated[str, "唯一Notebook名称(用于标识不同的Notebook)"],
-    notebook_path: Annotated[Path, "连接的Notebook路径(绝对路径)"]) -> str:
+    notebook_name: Annotated[str, "用于标识不同的Notebook的唯一名称"],
+    notebook_path: Annotated[str, "Notebook路径(相对路径)"],
+    mode: Annotated[
+        Literal["connect", "create"], 
+        "连接模式(connect: 连接已经存在的Notebook; create: 创建新的Notebook并连接)"
+        ] = "connect") -> str:
     """
-    连接指定路径的已经存在的Notebook
+    连接指定路径的Notebook
     """
     # 检查notebook是否已经连接
     if notebook_name in kernel_manager:
@@ -35,40 +35,64 @@ async def connect_notebook(
         else:
             return f"{notebook_name}命名已经存在,请重新命名"
     
-    # 检查notebook是否存在
-    if notebook_path.exists():
+    # 检查Jupyter与Kernel是否正常运行
+    try:
         kernel = KernelClient(server_url=server_url, token=token)
         kernel.start()
-        # 尝试连接notebook
-        try:
-            relative_path = str(notebook_path.relative_to(project_path))
-            ws_url = get_jupyter_notebook_websocket_url(server_url=server_url, token=token, path=relative_path)
-            async with NbModelClient(ws_url) as notebook:
-                list_info = list_notebook_cell_basic(notebook)
-        except Exception as e:
+        kernel.execute("print('Hello, World!')")
+    except Exception as e:
+        kernel.stop()
+        return f"""Jupyter环境连接失败!发生错误: {str(e)}
+        请检查: 
+        1. Jupyter环境是否成功启动 
+        2. URL地址是否正确且能正常访问
+        3. Token是否正确"""
+    
+    # 不同的连接方式的核验
+    # 先检查notebook路径是否存在
+    exist_result = Cell(kernel.execute(f'from pathlib import Path\nPath("{notebook_path}").exists()')).get_output_info(0)
+    if mode == "connect":
+        if (exist_result["output_type"] == "execute_result") and ("True" not in exist_result["output"]):
             kernel.stop()
-            return f"""发生错误: {e}\nJupyter环境连接失败,请检查:
-            1. Jupyter环境是否启动
-            2. URL地址是否正确
-            3. Token是否正确
-            """
-        # 连接成功,将kernel和notebook信息保存到kernel_manager中
-        kernel_manager[notebook_name] = {
-            "kernel": kernel,
-            "notebook": {
-                "server_url": server_url,
-                "token": token,
-                "path": relative_path
-            }
+            return f"Notebook路径不存在,请检查路径是否正确"
+        elif exist_result["output_type"] == "error":
+            kernel.stop()
+            return f"发生错误: {exist_result["output"]}"
+    elif mode == "create":
+        # 检查notebook路径是否已经存在
+        if (exist_result["output_type"] == "execute_result") and ("True" in exist_result["output"]):
+            kernel.stop()
+            return f"Notebook路径已经存在,请使用connect模式连接"    
+        # 创建新的notebook
+        create_code = f'import nbformat as nbf\nfrom pathlib import Path\nnotebook_path = Path("{notebook_path}")\nnb = nbf.v4.new_notebook()\nwith open(notebook_path, "w", encoding="utf-8") as f:\n    nbf.write(nb, f)\nprint("OK")'
+        create_result = Cell(kernel.execute(create_code)).get_output_info(0)
+        if create_result["output_type"] == "error":
+            kernel.stop()
+            return f"发生错误: {create_result["output"]}"
+    
+    # 尝试连接notebook
+    try:
+        ws_url = get_jupyter_notebook_websocket_url(server_url=server_url, token=token, path=notebook_path)
+        async with NbModelClient(ws_url) as notebook:
+            list_info = list_cell_basic(notebook)
+    except Exception as e:
+        kernel.stop()
+        return f"Notebook连接失败!发生错误: {e}"
+    
+    # 连接成功,将kernel和notebook信息保存到kernel_manager中
+    kernel.restart()
+    kernel_manager[notebook_name] = {
+        "kernel": kernel,
+        "notebook": {
+            "server_url": server_url,
+            "token": token,
+            "path": notebook_path
         }
-        return_info = f"连接成功! {notebook_name}的路径为: {notebook_path}\n"
-        return_info += "Cell基本信息如下:\n"
-        return_info += list_info
-        return return_info
-    else:
-        return "Notebook不存在,请检查Notebook路径是否正确(注意是绝对路径)"
+    }
+    return_info = f"{notebook_name}连接成功!\nCell基本信息如下:\n{list_info}"
+    return return_info
 
-@mcp.tool()
+@mcp.tool(tags={"core","notebook","list_notebook"})
 async def list_notebook() -> str:
     """
     列出所有目前连接的Notebook
@@ -77,20 +101,21 @@ async def list_notebook() -> str:
         return "当前没有连接的Notebook"
     
     # 准备表头
-    headers = ["Name", "Path"]
+    headers = ["Name", "Jupyter URL", "Path"]
     
     # 准备数据行
     rows = []
     for notebook_name, notebook_info in kernel_manager.items():
         notebook_path = notebook_info["notebook"]["path"]
-        rows.append([notebook_name, notebook_path])
+        server_url = notebook_info["notebook"]["server_url"]
+        rows.append([notebook_name, server_url, notebook_path])
     
     # 格式化为Markdown表格
     table = format_table(headers, rows)
     
     return table
 
-@mcp.tool()
+@mcp.tool(tags={"core","notebook","restart_notebook"})
 async def restart_notebook(
     notebook_name: Annotated[str, "Notebook名称"]) -> str:
     """
@@ -103,84 +128,24 @@ async def restart_notebook(
     return f"{notebook_name} 重启成功"
 
 #===========================================
-# Notebook管理模块(2个)
+# Cell基本功能模块(6个)
 #===========================================
 
-@mcp.tool()
-async def create_notebook(
-    notebook_path: Annotated[Path, "Notebook绝对路径"]) -> str:
-    """
-    创建一个空的Notebook文件
-    """
-    try:
-        if not notebook_path.is_absolute():
-            return "请提供绝对路径"
-        
-        # 确保文件扩展名是.ipynb
-        if notebook_path.suffix != '.ipynb':
-            return "文件扩展名必须是.ipynb"
-        
-        # 检查文件是否已存在
-        if notebook_path.exists():
-            return f"文件已存在: {notebook_path}"
-        
-        # 确保父目录存在
-        notebook_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        # 创建空的notebook结构
-        empty_notebook = {
-            "cells": [],
-            "metadata": {
-                "kernelspec": {
-                    "display_name": "Python 3",
-                    "language": "python",
-                    "name": "python3"
-                },
-                "language_info": {
-                    "codemirror_mode": {
-                        "name": "ipython",
-                        "version": 3
-                    },
-                    "file_extension": ".py",
-                    "mimetype": "text/x-python",
-                    "name": "python",
-                    "nbconvert_exporter": "python",
-                    "pygments_lexer": "ipython3",
-                    "version": "3.8.0"
-                }
-            },
-            "nbformat": 4,
-            "nbformat_minor": 4
-        }
-        
-        # 写入文件
-        with open(notebook_path, 'w', encoding='utf-8') as f:
-            json.dump(empty_notebook, f, indent=2, ensure_ascii=False)
-        
-        return f"Notebook创建成功!\nNotebook路径为: {notebook_path}"
-        
-    except Exception as e:
-        return f"创建Notebook失败!\n错误信息: {str(e)}"
-
-@mcp.tool()
-async def list_notebook_cell(
+@mcp.tool(tags={"core","cell","list_cell"})
+async def list_cell(
     notebook_name: Annotated[str, "Notebook名称"]) -> str:
     """
-    列出指定名称的Notebook的所有Cell的基本信息
+    列出Notebook的所有Cell的基本信息
     """
     if notebook_name not in kernel_manager:
         return "Notebook不存在,请检查notebook名称是否正确"
     
     ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
     async with NbModelClient(ws_url) as notebook: 
-        table = list_notebook_cell_basic(notebook)
+        table = list_cell_basic(notebook)
     return table
 
-#===========================================
-# Cell基本功能模块(4个)
-#===========================================
-
-@mcp.tool()
+@mcp.tool(tags={"core","cell","read_cell"})
 async def read_cell(
     notebook_name: Annotated[str, "Notebook名称"],
     cell_index: Annotated[int, "Cell索引"],
@@ -213,7 +178,7 @@ async def read_cell(
             
     return result
 
-@mcp.tool()
+@mcp.tool(tags={"core","cell","delete_cell"})
 async def delete_cell(
     notebook_name: Annotated[str, "Notebook名称"],
     cell_index: Annotated[int, "Cell索引"]) -> str:
@@ -231,11 +196,11 @@ async def delete_cell(
             return f"Cell索引{cell_index}超出范围,Notebook有{len(ydoc._ycells)}个Cell"
         
         del ydoc._ycells[cell_index]
-        now_notebook_info = list_notebook_cell_basic(notebook)
+        now_notebook_info = list_cell_basic(notebook)
 
     return f"删除成功!\n当前Notebook的Cell信息如下:\n{now_notebook_info}"
 
-@mcp.tool()
+@mcp.tool(tags={"core","cell","insert_cell"})
 async def insert_cell(
     notebook_name: Annotated[str, "Notebook名称"],
     cell_index: Annotated[int, "锚定索引"],
@@ -264,11 +229,11 @@ async def insert_cell(
                 notebook.add_markdown_cell(cell_content)
             else:
                 notebook.insert_markdown_cell(cell_index, cell_content)
-        now_notebook_info = list_notebook_cell_basic(notebook)
+        now_notebook_info = list_cell_basic(notebook)
         
     return f"插入成功!\n当前Notebook的Cell信息如下:\n{now_notebook_info}"
 
-@mcp.tool()
+@mcp.tool(tags={"core","cell","execute_cell"})
 async def execute_cell(
     notebook_name: Annotated[str, "Notebook名称"],
     cell_index: Annotated[int, "Cell索引"],
@@ -304,13 +269,8 @@ async def execute_cell(
     
     cell = Cell(ydoc.get_cell(cell_index))
     return cell.get_outputs()
-        
 
-#===========================================
-# Cell高级集成功能模块(3个)
-#===========================================
-
-@mcp.tool()
+@mcp.tool(tags={"core","cell","overwrite_cell"})
 async def overwrite_cell(
     notebook_name: Annotated[str, "Notebook名称"],
     cell_index: Annotated[int, "Cell索引"],
@@ -331,14 +291,18 @@ async def overwrite_cell(
 
     return f"覆盖成功!\n\n原内容:\n{raw_content}\n\n新内容:\n{cell_content}"
 
-@mcp.tool()
+#===========================================
+# Cell高级集成功能模块(2个)
+#===========================================
+
+@mcp.tool(tags={"advanced","cell","append_execute_cell"})
 async def append_execute_cell(
     notebook_name: Annotated[str, "Notebook名称"],
     cell_type: Annotated[Literal["code", "markdown"], "Cell类型"],
     cell_content: Annotated[str, "Cell内容"],
     timeout: Annotated[int, "超时时间(秒)"] = 60) -> list[str | Image]:
     """
-    在Notebook末尾添加并执行Cell(针对类型为code的Cell)
+    在Notebook末尾添加并执行Cell
     """
     if notebook_name not in kernel_manager:
         return ["Notebook不存在,请检查notebook名称是否正确"]
@@ -368,7 +332,7 @@ async def append_execute_cell(
             
             return [f"索引为{cell_index}的Markdown Cell添加成功!"]
 
-@mcp.tool()
+@mcp.tool(tags={"advanced","cell","execute_temporary_cell"})
 async def execute_temporary_cell(
     notebook_name: Annotated[str, "Notebook名称"],
     cell_content: Annotated[str, "临时执行内容"]) -> list[str | Image]:
@@ -376,7 +340,7 @@ async def execute_temporary_cell(
     执行临时代码块(不存储到Notebook中)
     
     使用情景:
-    1. 执行魔法指令(如`!pip install xxx`安装包,`%whos --module`查看已经导入的模块)
+    1. 执行魔法指令(如`%pip install xxx`安装包,`%whos --module`查看已经导入的模块)
     2. 进行代码片段调试
     3. 查看中间变量取值(例如`print(xxx)`或`df.head()`)
     4. 进行临时统计计算(例如`np.mean(df['xxx'])`)
