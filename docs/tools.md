@@ -111,7 +111,7 @@
 | `cell_index` | `int` | 作为锚点的Cell的索引 | |
 | `cell_type` | `Literal["code", "markdown"]` | 要插入的Cell的类型 | |
 | `cell_content` | `str` | 要插入的Cell的内容 | |
-| `location` | `Literal["above", "below"]` | 在锚点索引的`上方`或`下方`插入 | `"below"` |
+| `direction` | `Literal["above", "below"]` | 在锚点索引的`上方`或`下方`插入 | `"below"` |
 
 ---
 

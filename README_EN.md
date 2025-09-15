@@ -230,3 +230,13 @@ In addition, this project also referenced the implementations of the following e
 - [jjsantos01/jupyter-notebook-mcp](https://github.com/jjsantos01/jupyter-notebook-mcp)
 - [ihrpr/mcp-server-jupyter](https://github.com/ihrpr/mcp-server-jupyter)
 - [itisaevalex/jupyter-mcp-extended](https://github.com/itisaevalex/jupyter-mcp-extended)
+
+---
+
+<div align="center">
+
+**If this project is helpful to you, please give us a ⭐️**
+
+Made with ❤️ by [ChengJiale150](https://github.com/ChengJiale150)
+
+</div>

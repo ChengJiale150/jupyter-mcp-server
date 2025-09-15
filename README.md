@@ -230,3 +230,13 @@ Token = YOUR_TOKEN
 - [jjsantos01/jupyter-notebook-mcp](https://github.com/jjsantos01/jupyter-notebook-mcp)
 - [ihrpr/mcp-server-jupyter](https://github.com/ihrpr/mcp-server-jupyter)
 - [itisaevalex/jupyter-mcp-extended](https://github.com/itisaevalex/jupyter-mcp-extended)
+
+---
+
+<div align="center">
+
+**如果这个项目对您有帮助，请给我们一个 ⭐️**
+
+Made with ❤️ by [ChengJiale150](https://github.com/ChengJiale150)
+
+</div>

@@ -2,11 +2,25 @@ from jupyter_nbmodel_client import NbModelClient
 from .formatter import format_table
 
 def list_cell_basic(notebook: NbModelClient, with_count: bool = False) -> str:
+    """
+    列出Notebook中所有Cell的基本信息
+    List the basic information of all cells in the notebook
+
+    Args:
+        notebook: Notebook对象
+        notebook: The notebook object
+        with_count: 是否包含执行计数
+        with_count: Whether to include the execution count
+    
+    Returns:
+        格式化的表格字符串
+        The formatted table string
+    """
     ydoc = notebook._doc
     total_cell = len(ydoc._ycells)
     
     if total_cell == 0:
-        return "Notebook为空,没有Cell"
+        return "Notebook is empty, no Cell"
     
     headers = ["Index", "Type", "Content"] if not with_count else ["Index", "Type", "Count", "Content"]
     rows = []

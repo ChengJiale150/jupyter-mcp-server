@@ -111,7 +111,7 @@ This document provides a detailed introduction to all the tools offered by the J
 | `cell_index` | `int` | The index of the anchor cell. | |
 | `cell_type` | `Literal["code", "markdown"]` | The type of cell to insert. | |
 | `cell_content` | `str` | The content of the cell to insert. | |
-| `location` | `Literal["above", "below"]` | Whether to insert `above` or `below` the anchor index. | `"below"` |
+| `direction` | `Literal["above", "below"]` | Whether to insert `above` or `below` the anchor index. | `"below"` |
 
 ---
 
