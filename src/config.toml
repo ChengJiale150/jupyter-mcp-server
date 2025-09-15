@@ -1,16 +1,23 @@
 # 基础配置
+# Basic Configuration
 [basic]
 # 是否允许返回图片数据(Base64编码)
+# Whether to allow returning image data (Base64 encoded)
 ALLOW_IMG = true
 # 是否允许对图片进行压缩与预处理
+# Whether to allow compressing and preprocessing images
 ALLOW_IMG_PREPROCESS = true
 
 # 图片配置
+# Image Configuration
 [img]
 # 图片最大宽度
+# Maximum width of images
 MAX_WIDTH = 700
 # 图片最大高度
+# Maximum height of images
 MAX_HEIGHT = 700
-# 图片单个token的pixiv
+# 单个分块的pixiv
+# PIXIV token of a single chunk
 PIXIV_TOKEN = 28
 
