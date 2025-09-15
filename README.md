@@ -65,6 +65,7 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 | delete_cell  | 删除指定名称的Notebook指定索引的Cell       |                 |
 | insert_cell  | 在指定名称的Notebook指定索引处上方/下方插入Cell |                 |
 | execute_cell | 执行指定名称的Notebook指定索引的Cell       | 返回Cell的输出结果     |
+| overwrite_cell | 覆盖指定名称的Notebook指定索引的Cell内容 | 用于修改Cell内容     |
 
 ### Cell高级集成功能模块
 
@@ -72,6 +73,8 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 |:----------------------:|:----------------------:|:------------------------------------:|
 | append_execute_cell    | 在Notebook末尾添加并执行Cell   | insert+execute的组合为高频操作,将其组合减少工具的调用次数 |
 | execute_temporary_cell | 执行临时代码块(不存储到Notebook中) | 用于进行魔法指令执行、代码片段调试、查看中间变量取值等临时操作      |
+
+工具的具体内容详见[工具文档](./docs/tools.md)
 
 ## 🛠️ 快速上手
 
@@ -92,7 +95,7 @@ uv sync
 
 2. **(可选)配置config.toml**
 
-进入`src/config.toml`文件,根据需要配置参数(如是否允许返回图片数据)
+进入[src/config.toml](./src/config.toml)文件,根据需要配置参数(如是否允许返回图片数据)
 
 3. **启动Jupyter MCP Server**
 
@@ -128,6 +131,8 @@ MCP的标准JSON配置格式如下:
 }
 ```
 
+具体客户端集成详见[集成文档](./docs/integration.md)
+
 ### 启动Jupyter
 
 在正式使用前,需要连接Jupyter Server,这里介绍如何在本地启动Jupyter Server:
@@ -144,7 +149,7 @@ conda activate your_environment_name
 
 这里为了方便起见,这里可以直接使用`base`环境(`conda activate base`)
 
-然后推荐切换到你当前的项目目录,方便后续的文件操作
+然后切换到你当前的项目目录,方便后续的文件操作
 
 ```bash
 cd your/path/to/your/project
@@ -154,7 +159,7 @@ cd your/path/to/your/project
 
 ```bash
 pip uninstall -y pycrdt datalayer_pycrdt
-pip install jupyter jupyter-collaboration nbformat datalayer_pycrdt
+pip install jupyter nbformat datalayer_pycrdt jupyter-collaboration
 ```
 
 3. **启动Jupyter Server**:
@@ -165,7 +170,7 @@ pip install jupyter jupyter-collaboration nbformat datalayer_pycrdt
 jupyter lab --port 8888 --IdentityProvider.token YOUR_TOKEN --ip 0.0.0.0
 ```
 
-成功启动后会弹出浏览器窗口,你可以查看根路径是否为工程目录
+成功启动后会弹出浏览器窗口,你可以在此查看根路径是否为工程目录
 
 ### 使用Jupyter MCP Server
 
@@ -182,6 +187,13 @@ Token = YOUR_TOKEN
 在提供上述内容后,你就可以开始使用Jupyter MCP Server了!
 
 ## ✅ 最佳实践
+
+- 使用支持多模态输入的大模型(如Gemini 2.5 Pro)进行交互,以充分利用最先进的多模态理解能力
+- 使用支持MCP协议返回图像数据并支持解析的客户端(如Cursor、Gemini CLI等),部分客户端可能不支持该功能
+- 将复杂任务(如数据科学建模)拆分为多个子任务(如数据清洗、特征工程、模型训练、模型评估等),并逐步执行
+- 给出结构清晰的提示词与规则,这里可以参考[提示词与规则文档](./docs/prompt_example.md)
+- 在提示词中融入**专家经验与智慧**(如数据清洗、特征工程的技巧),这是AI最缺乏的,也是最需要补充的
+- 尽可能提供丰富的上下文信息(如现有数据集的字段解释,文件路径,详细的任务要求等)
 
 ## 🤝 贡献指南
 
@@ -200,6 +212,10 @@ Token = YOUR_TOKEN
 - ✨ 新功能开发
 - 📚 文档改进
 - 🌍 国际化支持
+
+### 开发帮助文档
+
+- 可以详见[项目架构文档](./src/README.md)辅助理解项目架构与关键通信流程
 
 ## 🤗 致谢
 
