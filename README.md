@@ -2,7 +2,9 @@
 
 <!-- omit in toc -->
 
-# 🪐 Jupyter MCP Server 
+# 🪐 Jupyter MCP Server
+
+<img title="Poster" src="./assets/poster.png" alt="Jupyter MCP Server" data-align="center" width="700">
 
 <strong>专门为AI连接与管理Jupyter Notebook而开发的MCP服务</strong>
 
@@ -12,7 +14,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-v0.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
 
-[English](./i18n/README_EN.md) | 中文
+[English](./README_EN.md) | 中文
 
 </div>
 
@@ -48,28 +50,28 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 
 ### Notebook管理模块
 
- | 名称            | 描述                     |说明|
-|:-------------:|:----------------------:|:----------------------:|
-| connect_notebook  | 连接/创建指定路径的Notebook            | 因为需要启动Kernel,工具执行时间较长(10s~30s) |
-| list_notebook | 列出所有目前连接的Notebook | 用于查看目前已经连接的Notebook,方便多Notebook任务执行 |
-| restart_notebook | 重启指定名称的Notebook | 清除所有导入包与变量 |
+| 名称               | 描述                 | 说明                                  |
+|:----------------:|:------------------:|:-----------------------------------:|
+| connect_notebook | 连接/创建指定路径的Notebook | 因为需要启动Kernel,工具执行时间较长(10s~30s)      |
+| list_notebook    | 列出所有目前连接的Notebook  | 用于查看目前已经连接的Notebook,方便多Notebook任务执行 |
+| restart_notebook | 重启指定名称的Notebook    | 清除所有导入包与变量                          |
 
 ### Cell基本功能模块
 
- | 名称            | 描述                     |说明|
-|:-------------:|:----------------------:|:----------------------:|
-| list_cell | 列出指定名称的Notebook的所有Cell的基本信息 | 用于定位Cell的索引与作用 |
-| read_cell | 读取指定名称的Notebook指定索引的Cell内容 | 支持图像、表格、文本等多种输出 |
-| delete_cell | 删除指定名称的Notebook指定索引的Cell |   |
-| insert_cell | 在指定名称的Notebook指定索引处上方/下方插入Cell |   |
-| execute_cell | 执行指定名称的Notebook指定索引的Cell | 返回Cell的输出结果 |
+| 名称           | 描述                             | 说明              |
+|:------------:|:------------------------------:|:---------------:|
+| list_cell    | 列出指定名称的Notebook的所有Cell的基本信息    | 用于定位Cell的索引与作用  |
+| read_cell    | 读取指定名称的Notebook指定索引的Cell内容     | 支持图像、表格、文本等多种输出 |
+| delete_cell  | 删除指定名称的Notebook指定索引的Cell       |                 |
+| insert_cell  | 在指定名称的Notebook指定索引处上方/下方插入Cell |                 |
+| execute_cell | 执行指定名称的Notebook指定索引的Cell       | 返回Cell的输出结果     |
 
 ### Cell高级集成功能模块
 
- | 名称            | 描述                     |说明|
-|:-------------:|:----------------------:|:----------------------:|
-| append_execute_cell | 在Notebook末尾添加并执行Cell | insert+execute的组合为高频操作,将其组合减少工具的调用次数 |
-| execute_temporary_cell | 执行临时代码块(不存储到Notebook中) | 用于进行魔法指令执行、代码片段调试、查看中间变量取值等临时操作 |
+| 名称                     | 描述                     | 说明                                   |
+|:----------------------:|:----------------------:|:------------------------------------:|
+| append_execute_cell    | 在Notebook末尾添加并执行Cell   | insert+execute的组合为高频操作,将其组合减少工具的调用次数 |
+| execute_temporary_cell | 执行临时代码块(不存储到Notebook中) | 用于进行魔法指令执行、代码片段调试、查看中间变量取值等临时操作      |
 
 ## 🛠️ 快速上手
 
@@ -181,7 +183,6 @@ Token = YOUR_TOKEN
 
 ## ✅ 最佳实践
 
-
 ## 🤝 贡献指南
 
 我们欢迎社区贡献！如果您想为Jupyter MCP Server项目做出贡献，请：
@@ -208,8 +209,8 @@ Token = YOUR_TOKEN
 - [FastMCP](https://github.com/jlowin/fastmcp): 感谢FastMCP的开发者们,没有FastMCP就没有Jupyter MCP的快速集成
 
 此外,本项目还参考了以下已有Jupyter MCP服务的实现,在此也一并表示感谢:
+
 - [datalayer/jupyter-mcp-server](https://github.com/datalayer/jupyter-mcp-server)
 - [jjsantos01/jupyter-notebook-mcp](https://github.com/jjsantos01/jupyter-notebook-mcp)
 - [ihrpr/mcp-server-jupyter](https://github.com/ihrpr/mcp-server-jupyter)
 - [itisaevalex/jupyter-mcp-extended](https://github.com/itisaevalex/jupyter-mcp-extended)
-

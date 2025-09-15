@@ -2,6 +2,15 @@
 [basic]
 # 是否允许返回图片数据(Base64编码)
 ALLOW_IMG = true
+# 是否允许对图片进行压缩与预处理
+ALLOW_IMG_PREPROCESS = true
 
-
+# 图片配置
+[img]
+# 图片最大宽度
+MAX_WIDTH = 700
+# 图片最大高度
+MAX_HEIGHT = 700
+# 图片单个token的pixiv
+PIXIV_TOKEN = 28
 

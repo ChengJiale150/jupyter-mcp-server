@@ -13,6 +13,7 @@ dependencies = [
     "jupyter-nbmodel-client>=0.14.0",
     "jupyterlab>=4.4.7",
     "nbformat>=5.10.4",
+    "pillow>=10.0.0",
 ]
 
 [[tool.uv.index]]
