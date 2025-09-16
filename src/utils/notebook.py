@@ -40,7 +40,7 @@ def list_cell_basic(notebook: NbModelClient, with_count: bool = False) -> str:
     table = format_table(headers, rows)
     return table
 
-def save_notebook(notebook: NbModelClient, file_path: str, kernel: KernelClient) -> None:
+def sync_notebook(notebook: NbModelClient, file_path: str, kernel: KernelClient) -> None:
     """
     Save the notebook to the file path
     """

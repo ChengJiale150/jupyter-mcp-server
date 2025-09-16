@@ -168,7 +168,7 @@ pip install jupyter nbformat datalayer_pycrdt jupyter-collaboration
 使用下述命令启动Jupyter Server,其中`YOUR_TOKEN`为认证Token,可自行修改
 
 ```bash
-jupyter lab --port 8888 --IdentityProvider.token YOUR_TOKEN --ip 0.0.0.0
+jupyter lab --port 8888 --IdentityProvider.token YOUR_TOKEN
 ```
 
 成功启动后会弹出浏览器窗口,你可以在此查看根路径是否为工程目录

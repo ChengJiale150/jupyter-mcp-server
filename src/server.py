@@ -1,11 +1,15 @@
+import asyncio, tomllib
+from pathlib import Path
 from fastmcp import FastMCP
-import asyncio
 from typing import Annotated, Literal
 from fastmcp.utilities.types import Image
-
+server_path = Path(__file__).parent
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
-from utils import list_cell_basic, Cell, format_table, format_notebook, save_notebook
+from utils import list_cell_basic, Cell, format_table, format_notebook, sync_notebook
+with open(server_path / "config.toml", "rb") as f:
+    config = tomllib.load(f)
+FORCE_SYNC = config["basic"]["FORCE_SYNC"]
 
 mcp = FastMCP(name="Jupyter-MCP-Server", version="1.0.0")
 
@@ -226,17 +230,22 @@ async def delete_cell(
         del ydoc._ycells[cell_index]
         now_notebook_info = list_cell_basic(notebook)
 
+        if FORCE_SYNC:
+            sync_notebook(notebook, 
+                          kernel_manager[notebook_name]["notebook"]["path"],
+                          kernel_manager[notebook_name]["kernel"])
+
     return f"Delete successful!\nCurrent Notebook's Cell information:\n{now_notebook_info}"
 
 @mcp.tool(tags={"core","cell","insert_cell"})
 async def insert_cell(
     notebook_name: str,
-    cell_index: Annotated[int, "target index(0-based)"],
+    cell_index: Annotated[int, "Anchor index(0-based)"],
     cell_type: Literal["code", "markdown"],
     cell_content: str,
     direction: Literal["above", "below"] = "below") -> str:
     """
-    Insert a cell above/below of a target index.
+    Insert a cell above/below of a anchor index.
     When inserting many cells, MUST insert them in ascending order of their index.
     """
     if notebook_name not in kernel_manager:
@@ -258,8 +267,9 @@ async def insert_cell(
                 notebook.add_markdown_cell(cell_content)
             else:
                 notebook.insert_markdown_cell(cell_index, cell_content)
-                
-            save_notebook(notebook, 
+
+        if FORCE_SYNC:
+            sync_notebook(notebook, 
                           kernel_manager[notebook_name]["notebook"]["path"],
                           kernel_manager[notebook_name]["kernel"])
         
@@ -324,9 +334,10 @@ async def overwrite_cell(
         
         raw_content = notebook._doc.get_cell(cell_index)['source']
         notebook.set_cell_source(cell_index, cell_content)
-        save_notebook(notebook, 
-                      kernel_manager[notebook_name]["notebook"]["path"],
-                      kernel_manager[notebook_name]["kernel"])
+        if FORCE_SYNC:
+            sync_notebook(notebook, 
+                        kernel_manager[notebook_name]["notebook"]["path"],
+                        kernel_manager[notebook_name]["kernel"])
 
     return f"Overwrite successful!\n\nOriginal content:\n{raw_content}\n\nNew content:\n{cell_content}"
 
@@ -371,9 +382,11 @@ async def append_execute_cell(
             return [f"Cell index {cell_index} execution successful!"] + cell.get_outputs()
         else:
             cell_index = notebook.add_markdown_cell(cell_content)
-            save_notebook(notebook, 
-                          kernel_manager[notebook_name]["notebook"]["path"],
-                          kernel_manager[notebook_name]["kernel"])
+            
+            if FORCE_SYNC:
+                sync_notebook(notebook, 
+                              kernel_manager[notebook_name]["notebook"]["path"],
+                              kernel_manager[notebook_name]["kernel"])
             
             return [f"Cell index {cell_index} Markdown Cell addition successful!"]
 

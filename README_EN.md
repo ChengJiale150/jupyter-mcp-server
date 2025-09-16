@@ -168,7 +168,7 @@ Before formal use, you need to connect to a Jupyter Server. Here is how to start
     Use the following command to start the Jupyter Server, where `YOUR_TOKEN` is the authentication token, which you can change.
 
     ```bash
-    jupyter lab --port 8888 --IdentityProvider.token YOUR_TOKEN --ip 0.0.0.0
+    jupyter lab --port 8888 --IdentityProvider.token YOUR_TOKEN
     ```
 
     After a successful start, a browser window will pop up. You can check if the root path is your project directory.
