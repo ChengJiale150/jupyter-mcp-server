@@ -47,6 +47,19 @@ This document provides a detailed introduction to all the tools offered by the J
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | The name of the Notebook to restart. | |
 
+---
+
+### `read_notebook`
+
+- **Function**: Reads the source content (without output) of a connected Notebook.
+- **Output**: Returns the source content of the Notebook (including index, type, execution count, and full source code).
+- **Important Notes**: Only used when the user explicitly instructs to read the full content of the Notebook.
+- **Parameters**:
+
+| Parameter | Type | Description | Default |
+| :--- | :--- | :--- | :--- |
+| `notebook_name` | `str` | The name of the Notebook to read. | |
+
 ## Basic Cell Function Module
 
 ### `list_cell`
@@ -77,7 +90,7 @@ This document provides a detailed introduction to all the tools offered by the J
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | The name of the Notebook. | |
 | `cell_index` | `int` | The index of the cell to read. | |
-| `include_output` | `bool` | Whether to include the cell's output. | `True` |
+| `return_output` | `bool` | Whether to include the cell's output. | `True` |
 
 ---
 

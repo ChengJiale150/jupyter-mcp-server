@@ -264,7 +264,13 @@ pwd
 
 <summary> Gemini CLI</summary>
 
-在项目中`.gemini`文件夹下的`settings.json`文件中添加如下内容:
+可以直接在终端中输入下述命令:
+
+```bash
+gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+```
+
+或者也可以在项目中`.gemini`文件夹下的`settings.json`文件中添加如下内容:
 
 ```json
 {
@@ -291,7 +297,13 @@ pwd
 
 <summary> Qwen Coder</summary>
 
-在项目中`.qwen`文件夹下的`settings.json`文件中添加如下内容:
+可以直接在终端中输入下述命令:
+
+```bash
+qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+```
+
+或者也可以在项目中`.qwen`文件夹下的`settings.json`文件中添加如下内容:
 
 ```json
 {
@@ -314,4 +326,15 @@ pwd
 
 </details>
 
+<details>
+
+<summary> Claude Code</summary>
+
+可以直接在终端中输入下述命令:
+
+```bash
+claude mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+```
+
+</details>
 

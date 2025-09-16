@@ -47,6 +47,18 @@
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | 要重启的Notebook的名称 | |
 
+---
+
+### `read_notebook`
+
+- **作用**: 读取指定Notebook的源内容(不包含输出)。
+- **输出内容**: 返回Notebook的源内容(包括索引、类型、执行计数和完整源代码)。
+- **必要说明**: 仅在明确要求时才使用。
+- **参数说明**:
+| 参数名 | 类型 | 说明 | 默认值 |
+| :--- | :--- | :--- | :--- |
+| `notebook_name` | `str` | 要读取的Notebook的名称 | |
+
 ## Cell基本功能模块
 
 ### `list_cell`
@@ -77,7 +89,7 @@
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | Notebook的名称 | |
 | `cell_index` | `int` | 要读取的Cell的索引 | |
-| `include_output` | `bool` | 是否包含Cell的输出内容 | `True` |
+| `return_output` | `bool` | 是否包含Cell的输出内容 | `True` |
 
 ---
 

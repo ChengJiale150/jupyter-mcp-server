@@ -55,6 +55,7 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 | connect_notebook | 连接/创建指定路径的Notebook | 因为需要启动Kernel,工具执行时间较长(10s~30s)      |
 | list_notebook    | 列出所有目前连接的Notebook  | 用于查看目前已经连接的Notebook,方便多Notebook任务执行 |
 | restart_notebook | 重启指定名称的Notebook    | 清除所有导入包与变量                          |
+| read_notebook    | 读取指定名称的Notebook的源内容(不包含输出) | 用于查看Notebook的源内容,仅在明确要求时才使用 |
 
 ### Cell基本功能模块
 
@@ -194,6 +195,7 @@ Token = YOUR_TOKEN
 - 给出结构清晰的提示词与规则,这里可以参考[提示词与规则文档](./docs/prompt_example.md)
 - 在提示词中融入**专家经验与智慧**(如数据清洗、特征工程的技巧),这是AI最缺乏的,也是最需要补充的
 - 尽可能提供丰富的上下文信息(如现有数据集的字段解释,文件路径,详细的任务要求等)
+- 提供Few Shot案例,提供Baseline或已有Workflow作为参考
 
 ## 🤝 贡献指南
 

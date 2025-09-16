@@ -29,7 +29,7 @@ def list_cell_basic(notebook: NbModelClient, with_count: bool = False) -> str:
         content_list = cell['source'].split("\n")
         execution_count = cell.get('execution_count', '')
         if len(content_list) > 1:
-            content = content_list[0] + "...(Full Content In Cell)"
+            content = content_list[0] + "...(Hidden)"
         else:
             content = cell['source']
         row = [i, cell['cell_type'], execution_count, content] if with_count else [i, cell['cell_type'], content]

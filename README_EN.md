@@ -55,6 +55,7 @@ Jupyter MCP Server was developed to address this issue. Through the MCP protocol
 | connect_notebook | Connect/create a Notebook at a specified path | Tool execution time is long (10s~30s) due to Kernel startup. |
 | list_notebook | List all currently connected Notebooks | Used to view currently connected Notebooks for multi-Notebook tasks. |
 | restart_notebook | Restart a specified Notebook | Clears all imported packages and variables. |
+| read_notebook | Read the source content (without output) of a connected Notebook | Used to view the source content of the Notebook, only used when the user explicitly instructs to read the full content of the Notebook. |
 
 ### Basic Cell Function Module
 
@@ -194,6 +195,7 @@ After providing the above content, you can start using Jupyter MCP Server!
 - Provide clearly structured prompts and rules. You can refer to the [Prompt and Rules Documentation](./docs/prompt_example_EN.md).
 - Incorporate **expert experience and wisdom** (such as data cleaning and feature engineering techniques) into your prompts, as this is what AI lacks most and needs to be supplemented.
 - Provide as much context as possible (such as field explanations for existing datasets, file paths, detailed task requirements, etc.).
+- Provide Few Shot examples, provide Baseline or existing Workflow as a reference.
 
 ## 🤝 Contribution Guidelines
 

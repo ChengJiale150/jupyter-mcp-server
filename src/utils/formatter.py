@@ -1,3 +1,5 @@
+from .cell import Cell
+
 def format_table(headers: list[str], rows: list[list[str]]) -> str:
     """
     格式化数据为TSV格式（制表符分隔值）
@@ -25,4 +27,18 @@ def format_table(headers: list[str], rows: list[list[str]]) -> str:
         data_row = "\t".join(str(cell) for cell in row)
         result.append(data_row)
     
+    return "\n".join(result)
+
+def format_notebook(cells: list[Cell]) -> str:
+    """
+    格式化Notebook中的所有Cell
+    Format a list of cells into a notebook
+    """
+    result = []
+    for cell in cells:
+        if cell.get_type() == "code":
+            cell_header = f"=====Index: {cell.get_index()}, Type: {cell.get_type()}, Execution Count: {cell.get_execution_count()}=====\n"
+        else:
+            cell_header = f"=====Index: {cell.get_index()}, Type: {cell.get_type()}=====\n"
+        result.append(cell_header+cell.get_source()+"\n\n")
     return "\n".join(result)

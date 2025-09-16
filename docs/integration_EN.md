@@ -264,7 +264,13 @@ Finally, save and close the `cline_mcp_settings.json` file. Go back and check if
 
 <summary> Gemini CLI</summary>
 
-Add the following content to the `settings.json` file in the `.gemini` folder of your project:
+You can also input the following command in the terminal:
+
+```bash
+gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+```
+
+Or you can also add the following content to the `settings.json` file in the `.gemini` folder of your project:
 
 ```json
 {
@@ -291,7 +297,13 @@ Add the following content to the `settings.json` file in the `.gemini` folder of
 
 <summary> Qwen Coder</summary>
 
-Add the following content to the `settings.json` file in the `.qwen` folder of your project:
+You can also input the following command in the terminal:
+
+```bash
+qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+```
+
+Or you can also add the following content to the `settings.json` file in the `.qwen` folder of your project:
 
 ```json
 {
@@ -310,6 +322,18 @@ Add the following content to the `settings.json` file in the `.qwen` folder of y
         }
     }
 }
+```
+
+</details>
+
+<details>
+
+<summary> Claude Code</summary>
+
+You can also input the following command in the terminal:
+
+```bash
+claude mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
 ```
 
 </details>

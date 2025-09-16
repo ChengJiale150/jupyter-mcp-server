@@ -5,7 +5,7 @@ from fastmcp.utilities.types import Image
 
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
-from utils import list_cell_basic, Cell, format_table
+from utils import list_cell_basic, Cell, format_table, format_notebook
 
 mcp = FastMCP(name="Jupyter-MCP-Server", version="1.0.0")
 
@@ -14,21 +14,22 @@ mcp = FastMCP(name="Jupyter-MCP-Server", version="1.0.0")
 kernel_manager = {}
 
 #===========================================
-# Notebook管理模块(3个)
-# Notebook management module (3)
+# Notebook管理模块(4个)
+# Notebook management module (4)
 #===========================================
 @mcp.tool(tags={"core","notebook","connect_notebook"})
 async def connect_notebook(
-    server_url: Annotated[str, "Jupyter server URL"], 
+    server_url: Annotated[str, "Jupyter server URL, e.g. http://localhost:8888"], 
     token: Annotated[str, "Authentication Token"], 
     notebook_name: Annotated[str, "Unique name for different notebooks"],
     notebook_path: Annotated[str, "Notebook path (relative path)"],
     mode: Annotated[
         Literal["connect", "create"], 
-        "Connection mode (connect: connect to an existing Notebook; create: create a new Notebook and connect)"
+        "connect: connect to an existing Notebook; create: create a new Notebook (not exist) and connect"
         ] = "connect") -> str:
     """
-    Connect to a Notebook and corresponding Kernel
+    Connect to a Notebook and corresponding Kernel.
+    It is the FIRST STEP before using following tools.
     """
     # 检查notebook是否已经连接
     # Check if the notebook is already connected
@@ -65,7 +66,7 @@ async def connect_notebook(
         if (exist_result["output_type"] == "execute_result") and ("True" in exist_result["output"]):
             kernel.stop()
             return f"Notebook path already exists, please use connect mode to connect"
-        create_code = f'import nbformat as nbf\nfrom pathlib import Path\nnotebook_path = Path("{notebook_path}")\nnb = nbf.v4.new_notebook()\nwith open(notebook_path, "w", encoding="utf-8") as f:\n    nbf.write(nb, f)\nprint("OK")'
+        create_code = f'import nbformat as nbf\nfrom pathlib import Path\nnotebook_path = Path("{notebook_path}")\nnb = nbf.v4.new_notebook()\nnb.cells.append(nbf.v4.new_markdown_cell("put metadata of the notebook here"))\nwith open(notebook_path, "w", encoding="utf-8") as f:\n    nbf.write(nb, f)\nprint("OK")'
         create_result = Cell(kernel.execute(create_code)).get_output_info(0)
         if create_result["output_type"] == "error":
             kernel.stop()
@@ -98,7 +99,8 @@ async def connect_notebook(
 @mcp.tool(tags={"core","notebook","list_notebook"})
 async def list_notebook() -> str:
     """
-    List all currently connected Notebooks
+    List all currently connected Notebooks.
+    It will return unique name, Jupyter URL and Path of all connected Notebooks
     """
     if not kernel_manager:
         return "No notebook is currently connected"
@@ -127,6 +129,27 @@ async def restart_notebook(
     kernel_manager[notebook_name]["kernel"].restart()
     return f"{notebook_name} restart successful"
 
+@mcp.tool(tags={"core","notebook","read_notebook"})
+async def read_notebook(
+    notebook_name: str) -> str:
+    """
+    Read the source content (without output) of a connected Notebook.
+    It will return the formatted content of the Notebook (including Index, Cell Type, Execution Count and Full Source Content).
+    ONLY used when the user explicitly instructs to read the full content of the Notebook.
+    """
+    if notebook_name not in kernel_manager:
+        return "Notebook does not exist, please connect it first"
+
+    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
+    async with NbModelClient(ws_url) as notebook:
+        ydoc = notebook._doc
+        cells = [
+            Cell(ydoc.get_cell(i))
+            for i in range(len(ydoc._ycells))
+        ]
+        formatted_content = format_notebook(cells)
+    return formatted_content
+
 #===========================================
 # Cell基本功能模块(6个)
 # Basic Cell Function Module (6)
@@ -136,7 +159,9 @@ async def restart_notebook(
 async def list_cell(
     notebook_name: str) -> str:
     """
-    List the basic information of all cells in a specified Notebook
+    List the basic information of all cells.
+    It will return Index, Type, Execution Count and First Line of the Cell.
+    It will be used to quickly overview the structure and current status of the Notebook or locate the index of specific cells for following operations(e.g. delete, insert).
     """
     if notebook_name not in kernel_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
@@ -150,9 +175,10 @@ async def list_cell(
 async def read_cell(
     notebook_name: str,
     cell_index: Annotated[int, "Cell index(0-based)"],
-    include_output: Annotated[bool, "Whether to include output"] = True) -> list[str | Image]:
+    return_output: Annotated[bool, "Whether to return output"] = True) -> list[str | Image]:
     '''
-    Read the content of a cell at a specified index in a Notebook
+    Read the detailed content of a specific cell.
+    It will return the source code, execution count and output of the cell.
     '''
     if notebook_name not in kernel_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
@@ -172,7 +198,7 @@ async def read_cell(
                 cell.get_source(),
                 f"Current execution count: {cell.get_execution_count()}"
             ]
-            if include_output:
+            if return_output:
                 result.extend(cell.get_outputs())
         else:
             result = cell.get_source()
@@ -184,7 +210,8 @@ async def delete_cell(
     notebook_name: str,
     cell_index: Annotated[int, "Cell index(0-based)"]) -> str:
     """
-    Delete a cell at a specified index in a Notebook
+    Delete a specific cell.
+    When deleting many cells, MUST delete them in descending order of their index.
     """
     if notebook_name not in kernel_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
@@ -204,12 +231,13 @@ async def delete_cell(
 @mcp.tool(tags={"core","cell","insert_cell"})
 async def insert_cell(
     notebook_name: str,
-    cell_index: Annotated[int, "Target index(0-based)"],
+    cell_index: Annotated[int, "target index(0-based)"],
     cell_type: Literal["code", "markdown"],
     cell_content: str,
     direction: Literal["above", "below"] = "below") -> str:
     """
-    Insert a cell above/below of a target index in a Notebook
+    Insert a cell above/below of a target index.
+    When inserting many cells, MUST insert them in ascending order of their index.
     """
     if notebook_name not in kernel_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
@@ -240,7 +268,8 @@ async def execute_cell(
     cell_index: Annotated[int, "Cell index(0-based)"],
     timeout: Annotated[int, "seconds"] = 60) -> list[str | Image]:
     """
-    Execute a cell at a specified index in a Notebook
+    Execute a specific cell with a timeout.
+    It will return the output of the cell.
     """
     if notebook_name not in kernel_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
@@ -276,7 +305,7 @@ async def overwrite_cell(
     cell_index: Annotated[int, "Cell index(0-based)"],
     cell_content: str) -> str:
     """
-    Overwrite the content of a cell at a specified index in a Notebook
+    Overwrite the content of a specific cell
     """
     if notebook_name not in kernel_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
@@ -303,7 +332,9 @@ async def append_execute_cell(
     cell_content: str,
     timeout: Annotated[int, "seconds"] = 60) -> list[str | Image]:
     """
-    Add a new cell to the end of a Notebook and immediately execute it
+    Add a new cell to the end of a Notebook and immediately execute it.
+    It will return the output of the cell.
+    It is highly recommended for replacing the combination of `insert_cell` and `execute_cell` at the end of the Notebook.
     """
     if notebook_name not in kernel_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
@@ -338,15 +369,15 @@ async def execute_temporary_cell(
     notebook_name: str,
     cell_content: str) -> list[str | Image]:
     """
-    Execute a temporary code block (not saved to the Notebook)
+    Execute a temporary code block (not saved to the Notebook) and will return the output.
     
-    Advise:
+    It will recommend to use in following cases:
     1. Execute Jupyter magic commands
     2. Debug code
     3. View intermediate variable values(e.g., `print(xxx)` or `df.head()`)
     4. Perform temporary statistical calculations(e.g., `np.mean(df['xxx'])`)
     
-    DO NOT:
+    DO NOT USE IN THE FOLLOWING CASES:
     1. Import new modules and perform variable assignments that affect subsequent Notebook execution
     2. Run code that requires a long time to run
     """
