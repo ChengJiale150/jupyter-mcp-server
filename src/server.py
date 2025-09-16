@@ -5,7 +5,7 @@ from fastmcp.utilities.types import Image
 
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
-from utils import list_cell_basic, Cell, format_table, format_notebook
+from utils import list_cell_basic, Cell, format_table, format_notebook, save_notebook
 
 mcp = FastMCP(name="Jupyter-MCP-Server", version="1.0.0")
 
@@ -258,7 +258,14 @@ async def insert_cell(
                 notebook.add_markdown_cell(cell_content)
             else:
                 notebook.insert_markdown_cell(cell_index, cell_content)
+                
+            save_notebook(notebook, 
+                          kernel_manager[notebook_name]["notebook"]["path"],
+                          kernel_manager[notebook_name]["kernel"])
+        
         now_notebook_info = list_cell_basic(notebook)
+        
+        
         
     return f"Insert successful!\nCurrent Notebook's Cell information:\n{now_notebook_info}"
 
@@ -317,6 +324,9 @@ async def overwrite_cell(
         
         raw_content = notebook._doc.get_cell(cell_index)['source']
         notebook.set_cell_source(cell_index, cell_content)
+        save_notebook(notebook, 
+                      kernel_manager[notebook_name]["notebook"]["path"],
+                      kernel_manager[notebook_name]["kernel"])
 
     return f"Overwrite successful!\n\nOriginal content:\n{raw_content}\n\nNew content:\n{cell_content}"
 
@@ -361,6 +371,9 @@ async def append_execute_cell(
             return [f"Cell index {cell_index} execution successful!"] + cell.get_outputs()
         else:
             cell_index = notebook.add_markdown_cell(cell_content)
+            save_notebook(notebook, 
+                          kernel_manager[notebook_name]["notebook"]["path"],
+                          kernel_manager[notebook_name]["kernel"])
             
             return [f"Cell index {cell_index} Markdown Cell addition successful!"]
 

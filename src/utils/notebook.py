@@ -1,5 +1,7 @@
 from jupyter_nbmodel_client import NbModelClient
+from jupyter_kernel_client import KernelClient
 from .formatter import format_table
+import json, base64
 
 def list_cell_basic(notebook: NbModelClient, with_count: bool = False) -> str:
     """
@@ -37,3 +39,13 @@ def list_cell_basic(notebook: NbModelClient, with_count: bool = False) -> str:
     
     table = format_table(headers, rows)
     return table
+
+def save_notebook(notebook: NbModelClient, file_path: str, kernel: KernelClient) -> None:
+    """
+    Save the notebook to the file path
+    """
+    json_str = json.dumps(notebook._doc.source, ensure_ascii=False)
+    json_bytes = json_str.encode('utf-8')
+    base64_bytes = base64.b64encode(json_bytes)
+    base64_str = base64_bytes.decode('utf-8')
+    kernel.execute(f'import base64,json\nwith open("{file_path}", "w", encoding="utf-8") as json_file:\n    json.dump(json.loads(base64.b64decode("{base64_str}".encode("utf-8")).decode("utf-8")), json_file, indent=4, ensure_ascii=False)')
