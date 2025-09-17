@@ -17,7 +17,7 @@
 
 Next, add the MCP service to the MCP configuration file in the corresponding client.
 
-details>
+<details>
 
 <summary> Cursor</summary>
 

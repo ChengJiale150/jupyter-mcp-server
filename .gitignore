@@ -14,4 +14,6 @@ wheels/
 .ipynb_checkpoints/
 .jupyter_ystore.db
 
+# AI Settings
 .gemini/
+.cursor/

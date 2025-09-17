@@ -4,7 +4,7 @@
 
 # 🪐 Jupyter MCP Server
 
-<img title="Poster" src="./assets/poster.png" alt="Jupyter MCP Server" data-align="center" width="700">
+<img title="cover" src="./assets/cover.png" alt="Jupyter MCP Server" data-align="center" width="700">
 
 <strong>专门为AI连接与管理Jupyter Notebook而开发的MCP服务</strong>
 
