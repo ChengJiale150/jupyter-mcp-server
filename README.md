@@ -4,7 +4,7 @@
 
 # 🪐 Jupyter MCP Server
 
-<img title="cover" src="./assets/cover.png" alt="Jupyter MCP Server" data-align="center" width="700">
+<img title="cover" src="https://raw.githubusercontent.com/ChengJiale150/jupyter-mcp-server/main/assets/cover.png" alt="Jupyter MCP Server" data-align="center" width="700">
 
 <strong>专门为AI连接与管理Jupyter Notebook而开发的MCP服务</strong>
 
@@ -12,9 +12,12 @@
 
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
+[![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
 
-[English](./README_EN.md) | 中文
+[English](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/README_EN.md) | 中文
+
+<!-- MCP Registry Name for PyPI Validation -->
+mcp-name: io.github.ChengJiale150/jupyter-mcp-server
 
 </div>
 
@@ -75,7 +78,7 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 | append_execute_cell    | 在Notebook末尾添加并执行Cell   | insert+execute的组合为高频操作,将其组合减少工具的调用次数 |
 | execute_temporary_cell | 执行临时代码块(不存储到Notebook中) | 用于进行魔法指令执行、代码片段调试、查看中间变量取值等临时操作      |
 
-工具的具体内容详见[工具文档](./docs/tools.md)
+工具的具体内容详见[工具文档](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/tools.md)
 
 ## 🛠️ 快速上手
 
@@ -107,7 +110,7 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 }
 ```
 
-具体客户端集成详见[集成文档](./docs/integration.md)
+具体客户端集成详见[集成文档](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/integration.md)
 
 </details>
 
@@ -160,7 +163,7 @@ uv run fastmcp run src/better_jupyter_mcp_server/server.py
 ```
 
 
-具体客户端集成详见[集成文档](./docs/integration.md)
+具体客户端集成详见[集成文档](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/integration.md)
 
 </details>
 
@@ -222,7 +225,7 @@ Token = YOUR_TOKEN
 - 使用支持多模态输入的大模型(如Gemini 2.5 Pro)进行交互,以充分利用最先进的多模态理解能力
 - 使用支持MCP协议返回图像数据并支持解析的客户端(如Cursor、Gemini CLI等),部分客户端可能不支持该功能
 - 将复杂任务(如数据科学建模)拆分为多个子任务(如数据清洗、特征工程、模型训练、模型评估等),并逐步执行
-- 给出结构清晰的提示词与规则,这里可以参考[提示词与规则文档](./docs/prompt_example.md)
+- 给出结构清晰的提示词与规则,这里可以参考[提示词与规则文档](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/prompt_example.md)
 - 在提示词中融入**专家经验与智慧**(如数据清洗、特征工程的技巧),这是AI最缺乏的,也是最需要补充的
 - 尽可能提供丰富的上下文信息(如现有数据集的字段解释,文件路径,详细的任务要求等)
 - 提供Few Shot案例,提供Baseline或已有Workflow作为参考
@@ -247,7 +250,7 @@ Token = YOUR_TOKEN
 
 ### 开发帮助文档
 
-- 可以详见[项目架构文档](./src/README.md)辅助理解项目架构与关键通信流程
+- 可以详见[项目架构文档](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/src/README.md)辅助理解项目架构与关键通信流程
 
 ## 🤗 致谢
 

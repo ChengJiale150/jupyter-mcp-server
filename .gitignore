@@ -17,3 +17,7 @@ wheels/
 # AI Settings
 .gemini/
 .cursor/
+
+# MCP Registry
+.mcpregistry_registry_token
+.mcpregistry_github_token

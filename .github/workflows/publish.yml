@@ -1,0 +1,79 @@
+name: Publish to PyPI and MCP Registry
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
+        default: '1.1.0'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # 用于PyPI trusted publishing
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      
+    - name: Install dependencies
+      run: uv sync
+      
+    - name: Build package
+      run: uv build
+      
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        skip-existing: true
+        
+    - name: Install MCP Publisher
+      run: |
+        curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.0.0/mcp-publisher_1.0.0_linux_amd64.tar.gz" | tar xz
+        chmod +x mcp-publisher
+        sudo mv mcp-publisher /usr/local/bin/
+        
+    - name: Validate server.json
+      run: |
+        python -c "
+        import json
+        import jsonschema
+        import requests
+        
+        with open('server.json', 'r') as f:
+            server_data = json.load(f)
+            
+        schema_url = server_data['\$schema']
+        response = requests.get(schema_url)
+        schema = response.json()
+        
+        jsonschema.validate(server_data, schema)
+        print('✅ server.json validation passed')
+        "
+        
+    - name: Authenticate with MCP Registry (GitHub)
+      run: |
+        echo "${{ secrets.GITHUB_TOKEN }}" | mcp-publisher login github --token-stdin
+        
+    - name: Publish to MCP Registry
+      run: |
+        mcp-publisher publish
+        
+    - name: Verify publication
+      run: |
+        sleep 10  # 等待注册表更新
+        curl -f "https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ChengJiale150/jupyter-mcp-server" || echo "Server not found yet, may take time to propagate"

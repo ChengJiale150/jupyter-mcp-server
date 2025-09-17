@@ -4,7 +4,7 @@
 
 # 🪐 Jupyter MCP Server
 
-<img title="cover" src="./assets/cover.png" alt="Jupyter MCP Server" data-align="center" width="700">
+<img title="cover" src="https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/assets/cover.png" alt="Jupyter MCP Server" data-align="center" width="700">
 
 **An MCP service specifically developed for AI to connect and manage Jupyter Notebooks**
 
@@ -12,9 +12,12 @@
 
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
+[![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
 
 English | [中文](./README.md)
+
+<!-- MCP Registry Name for PyPI Validation -->
+mcp-name: io.github.ChengJiale150/jupyter-mcp-server
 
 </div>
 
