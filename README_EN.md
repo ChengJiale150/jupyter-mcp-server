@@ -12,7 +12,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
 
 English | [中文](./README.md)
 
@@ -86,6 +86,33 @@ For more details on the tools, please see the [Tools Documentation](./docs/tools
 
 ### Installing Jupyter MCP Server
 
+<details>
+<summary>uvx Quick Installation (Recommended)</summary>
+
+After installing uv, configure the MCP JSON format directly, as shown below:
+
+```json
+{
+    "mcpServers":{
+        "Jupyter-MCP-Server":{
+            "command": "uvx",
+            "args": [
+                "better-jupyter-mcp-server"
+            ],
+            "env": {},
+            "transport": "stdio"
+        }
+    }
+}
+```
+
+For specific client integration, please see the [Integration Documentation](./docs/integration_EN.md).
+
+</details>
+
+<details>
+<summary>Source Code</summary>
+
 1.  **Clone the project and install dependencies**
 
     ```bash
@@ -101,7 +128,7 @@ For more details on the tools, please see the [Tools Documentation](./docs/tools
 3.  **Start Jupyter MCP Server**
 
     ```bash
-    uv run fastmcp run src/server.py
+    uv run fastmcp run src/better_jupyter_mcp_server/server.py
     ```
 
     If it starts successfully, you will see output similar to this:
@@ -110,29 +137,29 @@ For more details on the tools, please see the [Tools Documentation](./docs/tools
     [09/14/25 20:14:59] INFO     Starting MCP server 'Jupyter-MCP-Server' with transport 'stdio'
     ```
 
-### Integrating in a Client
+4.  **Configure Standard JSON Format**
 
-The standard JSON configuration for MCP is as follows:
-
-```json
-{
-    "mcpServers":{
-        "Jupyter-MCP-Server":{
-            "command": "uv",
-            "args": [
-                "run",
-                "--directory",
-                "your/path/to/jupyter-mcp-server",
-                "src/server.py"
-            ],
-            "env": {},
-            "transport": "stdio"
+    ```json
+    {
+        "mcpServers":{
+            "Jupyter-MCP-Server":{
+                "command": "uv",
+                "args": [
+                    "run",
+                    "--directory",
+                    "your/path/to/jupyter-mcp-server",
+                    "src/better_jupyter_mcp_server/server.py"
+                ],
+                "env": {},
+                "transport": "stdio"
+            }
         }
     }
-}
-```
+    ```
 
-For specific client integration, please see the [Integration Documentation](./docs/integration_EN.md).
+    For specific client integration, please see the [Integration Documentation](./docs/integration_EN.md).
+
+</details>
 
 ### Starting Jupyter
 

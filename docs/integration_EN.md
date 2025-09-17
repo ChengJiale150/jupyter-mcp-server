@@ -1,4 +1,177 @@
-# Configure Necessary Paths
+# uvx Quick Installation (Recommended)
+
+```json
+{
+    "mcpServers":{
+        "Jupyter-MCP-Server":{
+            "command": "uvx",
+            "args": [
+                "better-jupyter-mcp-server"
+            ],
+            "env": {},
+            "transport": "stdio"
+        }
+    }
+}
+```
+
+Next, add the MCP service to the MCP configuration file in the corresponding client.
+
+details>
+
+<summary> Cursor</summary>
+
+In the upper right corner of Cursor, open `Cursor Settings` (⚙ icon), select `Tool & Integrations`, and click `New MCP Server` in `MCP Tools`. This will take you to the `mcp.json` file. An example result is as follows:
+
+```json
+{
+  "mcpServers": {
+    ...(existing MCPs, empty if none)
+  }
+}
+```
+
+Paste the completed JSON file after the existing MCPs. The final reference result is as follows:
+
+```json
+{
+  "mcpServers": {
+    ...(existing MCPs, empty if none),
+    "Jupyter-MCP-Server" : {
+        ...(the content from above)
+    }
+  }
+}
+```
+
+Finally, save and close the `mcp.json` file. Go back and check if an MCP service named `Jupyter-MCP-Server` appears in `MCP Tools`. Wait a moment, and if the yellow light turns green, it means the MCP service has started successfully.
+
+</details>
+
+<details>
+
+<summary> Trae</summary>
+
+Open the AI function management button (⚙ icon) on the side of the application, select `MCP`, click `Import from JSON` under `Manual Add`, and enter the following content:
+
+```json
+{
+  "mcpServers": {
+    "Jupyter-MCP-Server" : {
+        ...(the content from above)
+    }
+  }
+}
+```
+
+Click confirm, open the corresponding MCP server, and check if the connection is successful.
+
+</details>
+
+<details>
+
+<summary> Cline</summary>
+
+At the bottom of the conversation, open `Manager MCP Servers`, click the settings button (⚙ icon), select `Installed`, and click `Configure MCP Servers`. This will take you to the `cline_mcp_settings.json` file. An example result is as follows:
+
+```json
+{
+  "mcpServers": {
+    ...(existing MCPs, empty if none)
+  }
+}
+```
+
+Add a `,` (comma) after the existing MCPs (if any), and then paste the completed JSON file. The final reference result is as follows:
+
+```json
+{
+  "mcpServers": {
+    ...(existing MCPs, empty if none),
+    "Jupyter-MCP-Server" : {
+        ...(the content from above)
+    }
+  }
+}
+```
+
+Finally, save and close the `cline_mcp_settings.json` file. Go back and check if an MCP service named `Jupyter-MCP-Server` appears. Start it and wait a moment. If it turns green, it means the MCP service has started successfully.
+
+</details>
+
+<details>
+
+<summary> Gemini CLI</summary>
+
+You can also input the following command in the terminal:
+
+```bash
+gemini mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+```
+
+Or you can also add the following content to the `settings.json` file in the `.gemini` folder of your project:
+
+```json
+{
+    ...(existing configurations, empty if none),
+    "mcpServers":{
+        ...(existing MCPs, empty if none),
+        "Jupyter-MCP-Server":{
+            "command": "uvx",
+            "args": [
+                "better-jupyter-mcp-server"
+            ],
+            "env": {}
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+
+<summary> Qwen Coder</summary>
+
+You can also input the following command in the terminal:
+
+```bash
+qwen mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+```
+
+Or you can also add the following content to the `settings.json` file in the `.qwen` folder of your project:
+
+```json
+{
+    ...(existing configurations, empty if none),
+    "mcpServers":{
+        ...(existing MCPs, empty if none),
+        "Jupyter-MCP-Server":{
+            "command": "uvx",
+            "args": [
+                "better-jupyter-mcp-server"
+            ],
+            "env": {}
+        }
+    }
+}
+```
+
+</details>
+
+<details>
+
+<summary> Claude Code</summary>
+
+You can also input the following command in the terminal:
+
+```bash
+claude mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+```
+
+</details>
+
+# Source Code
 
 ```json
 {
@@ -9,7 +182,7 @@
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/server.py"
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -50,7 +223,7 @@ Finally, replace the file path in the reference JSON format with the copied path
                 "run",
                 "--directory",
                 "C:\\Users\\username\\Desktop\\MCP\\jupyter-mcp-server",
-                "src/server.py"
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -81,7 +254,7 @@ Finally, replace the file path in the reference JSON format with the copied path
                 "run",
                 "--directory",
                 "/Users/username/Documents/mcp/jupyter-mcp-server",
-                "src/server.py"
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -126,7 +299,7 @@ Finally, replace the file path in the reference JSON format with the copied path
                 "run",
                 "--directory",
                 "C:\\Users\\username\\Desktop\\MCP\\jupyter-mcp-server",
-                "src/server.py"
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -160,10 +333,7 @@ Finally, replace the file path in the reference JSON format with the copied path
         "Jupyter-MCP-Server":{
             "command": "uv",
             "args": [
-                "run",
-                "--directory",
-                "/Users/username/Documents/mcp/jupyter-mcp-server",
-                "src/server.py"
+                "better-jupyter-mcp-server"
             ],
             "env": {},
             "transport": "stdio"
@@ -267,7 +437,7 @@ Finally, save and close the `cline_mcp_settings.json` file. Go back and check if
 You can also input the following command in the terminal:
 
 ```bash
-gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/better_jupyter_mcp_server/server.py
 ```
 
 Or you can also add the following content to the `settings.json` file in the `.gemini` folder of your project:
@@ -283,7 +453,7 @@ Or you can also add the following content to the `settings.json` file in the `.g
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/server.py"
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {}
         }
@@ -300,7 +470,7 @@ Or you can also add the following content to the `settings.json` file in the `.g
 You can also input the following command in the terminal:
 
 ```bash
-qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/better_jupyter_mcp_server/server.py
 ```
 
 Or you can also add the following content to the `settings.json` file in the `.qwen` folder of your project:
@@ -316,7 +486,7 @@ Or you can also add the following content to the `settings.json` file in the `.q
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/server.py"
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {}
         }
@@ -333,7 +503,7 @@ Or you can also add the following content to the `settings.json` file in the `.q
 You can also input the following command in the terminal:
 
 ```bash
-claude mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/server.py
+claude mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/better_jupyter_mcp_server/server.py
 ```
 
 </details>

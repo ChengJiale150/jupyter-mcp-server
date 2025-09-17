@@ -6,12 +6,12 @@ from fastmcp.utilities.types import Image
 server_path = Path(__file__).parent
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
-from utils import list_cell_basic, Cell, format_table, format_notebook, sync_notebook
+from .utils import list_cell_basic, Cell, format_table, format_notebook, sync_notebook
 with open(server_path / "config.toml", "rb") as f:
     config = tomllib.load(f)
 FORCE_SYNC = config["basic"]["FORCE_SYNC"]
 
-mcp = FastMCP(name="Jupyter-MCP-Server", version="1.0.0")
+mcp = FastMCP(name="Jupyter-MCP-Server", version="1.1.0")
 
 # 用于管理不同notebook的kernel
 # Used to manage different notebooks' kernels
@@ -70,7 +70,7 @@ async def connect_notebook(
         if (exist_result["output_type"] == "execute_result") and ("True" in exist_result["output"]):
             kernel.stop()
             return f"Notebook path already exists, please use connect mode to connect"
-        create_code = f'import nbformat as nbf\nfrom pathlib import Path\nnotebook_path = Path("{notebook_path}")\nnb = nbf.v4.new_notebook()\nnb.cells.append(nbf.v4.new_markdown_cell("put metadata of the notebook here"))\nwith open(notebook_path, "w", encoding="utf-8") as f:\n    nbf.write(nb, f)\nprint("OK")'
+        create_code = f'import nbformat as nbf\nfrom pathlib import Path\nnotebook_path = Path("{notebook_path}")\nnb = nbf.v4.new_notebook()\nnb.cells.append(nbf.v4.new_markdown_cell("overwrite this cell for real notebook metadata"))\nwith open(notebook_path, "w", encoding="utf-8") as f:\n    nbf.write(nb, f)\nprint("OK")'
         create_result = Cell(kernel.execute(create_code)).get_output_info(0)
         if create_result["output_type"] == "error":
             kernel.stop()
@@ -414,6 +414,10 @@ async def execute_temporary_cell(
     cell = Cell(kernel.execute(cell_content))
     return cell.get_outputs()
     
-if __name__ == "__main__":
+def main():
+    """Main entry point for the better-jupyter-mcp-server command."""
     mcp.run(transport="stdio")
+
+if __name__ == "__main__":
+    main()
 

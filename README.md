@@ -12,7 +12,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v0.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
 
 [English](./README_EN.md) | 中文
 
@@ -86,6 +86,35 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 
 ### 安装Jupyter MCP Server
 
+<details>
+
+<summary>uvx 快速安装(推荐)</summary>
+
+在安装uv后,直接配置MCP的JSON格式即可,示例如下:
+
+```json
+{
+    "mcpServers":{
+        "Jupyter-MCP-Server":{
+            "command": "uvx",
+            "args": [
+                "better-jupyter-mcp-server"
+            ],
+            "env": {},
+            "transport": "stdio"
+        }
+    }
+}
+```
+
+具体客户端集成详见[集成文档](./docs/integration.md)
+
+</details>
+
+<details>
+
+<summary>源代码</summary>
+
 1. **克隆项目并安装依赖**
 
 ```bash
@@ -101,18 +130,16 @@ uv sync
 3. **启动Jupyter MCP Server**
 
 ```bash
-uv run fastmcp run src/server.py
+uv run fastmcp run src/better_jupyter_mcp_server/server.py
 ```
 
-如果成功启动,会输出类似如下信息:
+如果成功启动,会输出类似如下信息代表启动成功:
 
 ```bash
 [09/14/25 20:14:59] INFO     Starting MCP server 'Jupyter-MCP-Server' with transport 'stdio'  
 ```
 
-### 在客户端中集成
-
-MCP的标准JSON配置格式如下:
+4. **配置标准JSON格式**
 
 ```json
 {
@@ -123,7 +150,7 @@ MCP的标准JSON配置格式如下:
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/server.py"
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -132,7 +159,10 @@ MCP的标准JSON配置格式如下:
 }
 ```
 
+
 具体客户端集成详见[集成文档](./docs/integration.md)
+
+</details>
 
 ### 启动Jupyter
 
