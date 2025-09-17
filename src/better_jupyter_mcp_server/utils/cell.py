@@ -103,8 +103,8 @@ class Cell:
     def get_source(self) -> str:
         return self.cell['source']
 
-    def get_execution_count(self) -> int:
-        return self.cell.get('execution_count', 0)
+    def get_execution_count(self) -> int | str:
+        return self.cell.get('execution_count', 'N/A')
     
     def get_output_info(self, index: int) -> dict:
         outputs = self.cell.get('outputs', [])

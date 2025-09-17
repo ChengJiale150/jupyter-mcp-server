@@ -1,6 +1,7 @@
 from jupyter_nbmodel_client import NbModelClient
 from jupyter_kernel_client import KernelClient
 from .formatter import format_table
+from .cell import Cell
 import json, base64
 
 def list_cell_basic(notebook: NbModelClient, with_count: bool = False) -> str:
@@ -27,14 +28,12 @@ def list_cell_basic(notebook: NbModelClient, with_count: bool = False) -> str:
     headers = ["Index", "Type", "Content"] if not with_count else ["Index", "Type", "Count", "Content"]
     rows = []
     for i in range(total_cell):
-        cell = ydoc.get_cell(i)
-        content_list = cell['source'].split("\n")
-        execution_count = cell.get('execution_count', '')
-        if len(content_list) > 1:
-            content = content_list[0] + "...(Hidden)"
-        else:
-            content = cell['source']
-        row = [i, cell['cell_type'], execution_count, content] if with_count else [i, cell['cell_type'], content]
+        cell = Cell(ydoc.get_cell(i))
+        cell_type = cell.get_type()
+        execution_count = cell.get_execution_count()
+        content_list = cell.get_source().split("\n")
+        cell_content = content_list[0] + "...(Hidden)" if len(content_list) > 1 else cell.get_source()
+        row = [i, cell_type, execution_count, cell_content] if with_count else [i, cell_type, cell_content]
         rows.append(row)
     
     table = format_table(headers, rows)
