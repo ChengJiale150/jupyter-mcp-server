@@ -13,11 +13,10 @@
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
+[![pypi](https://img.shields.io/pypi/v/better-jupyter-mcp-server)](https://pypi.org/project/better-jupyter-mcp-server/)
+[![mcp-registry](https://img.shields.io/badge/mcp--registry-v1.1.0-blue)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ChengJiale150/jupyter-mcp-server)
 
 [English](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/README_EN.md) | 中文
-
-<!-- MCP Registry Name for PyPI Validation -->
-mcp-name: io.github.ChengJiale150/jupyter-mcp-server
 
 </div>
 
@@ -229,6 +228,10 @@ Token = YOUR_TOKEN
 - 在提示词中融入**专家经验与智慧**(如数据清洗、特征工程的技巧),这是AI最缺乏的,也是最需要补充的
 - 尽可能提供丰富的上下文信息(如现有数据集的字段解释,文件路径,详细的任务要求等)
 - 提供Few Shot案例,提供Baseline或已有Workflow作为参考
+
+### 示例
+
+- [Titanic数据集分析](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/example/Titanic)
 
 ## 🤝 贡献指南
 

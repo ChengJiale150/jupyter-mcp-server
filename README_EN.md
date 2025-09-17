@@ -13,11 +13,10 @@
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
+[![pypi](https://img.shields.io/pypi/v/better-jupyter-mcp-server)](https://pypi.org/project/better-jupyter-mcp-server/)
+[![mcp-registry](https://img.shields.io/badge/mcp--registry-v1.1.0-blue)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ChengJiale150/jupyter-mcp-server)
 
-English | [中文](./README.md)
-
-<!-- MCP Registry Name for PyPI Validation -->
-mcp-name: io.github.ChengJiale150/jupyter-mcp-server
+English | [中文](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/README.md)
 
 </div>
 
@@ -78,7 +77,7 @@ Jupyter MCP Server was developed to address this issue. Through the MCP protocol
 | append_execute_cell | Add and execute a cell at the end of a Notebook | A combination of insert+execute for frequent operations, reducing tool calls. |
 | execute_temporary_cell | Execute a temporary code block (not saved to the Notebook) | Used for magic commands, code snippet debugging, viewing intermediate variables, etc. |
 
-For more details on the tools, please see the [Tools Documentation](./docs/tools_EN.md).
+For more details on the tools, please see the [Tools Documentation](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/tools_EN.md).
 
 ## 🛠️ Quick Start
 
@@ -109,7 +108,7 @@ After installing uv, configure the MCP JSON format directly, as shown below:
 }
 ```
 
-For specific client integration, please see the [Integration Documentation](./docs/integration_EN.md).
+For specific client integration, please see the [Integration Documentation](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/integration_EN.md).
 
 </details>
 
@@ -160,7 +159,7 @@ For specific client integration, please see the [Integration Documentation](./do
     }
     ```
 
-    For specific client integration, please see the [Integration Documentation](./docs/integration_EN.md).
+    For specific client integration, please see the [Integration Documentation](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/integration_EN.md).
 
 </details>
 
@@ -222,10 +221,14 @@ After providing the above content, you can start using Jupyter MCP Server!
 - Interact with a large model that supports multimodal input (like Gemini 2.5 Pro) to fully utilize advanced multimodal understanding capabilities.
 - Use a client that supports returning image data via the MCP protocol and can parse it (like Cursor, Gemini CLI, etc.), as some clients may not support this feature.
 - Break down complex tasks (like data science modeling) into multiple sub-tasks (like data cleaning, feature engineering, model training, model evaluation, etc.) and execute them step-by-step.
-- Provide clearly structured prompts and rules. You can refer to the [Prompt and Rules Documentation](./docs/prompt_example_EN.md).
+- Provide clearly structured prompts and rules. You can refer to the [Prompt and Rules Documentation](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/prompt_example_EN.md).
 - Incorporate **expert experience and wisdom** (such as data cleaning and feature engineering techniques) into your prompts, as this is what AI lacks most and needs to be supplemented.
 - Provide as much context as possible (such as field explanations for existing datasets, file paths, detailed task requirements, etc.).
 - Provide Few Shot examples, provide Baseline or existing Workflow as a reference.
+
+### Examples
+
+- [Titanic Data Analysis](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/example/Titanic)
 
 ## 🤝 Contribution Guidelines
 
@@ -247,7 +250,7 @@ We welcome community contributions! If you would like to contribute to the Jupyt
 
 ### Development Help Documentation
 
-- You can refer to the [Project Architecture Document](./src/README_EN.md) to help understand the project architecture and key communication flows.
+- You can refer to the [Project Architecture Document](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/src/README_EN.md) to help understand the project architecture and key communication flows.
 
 ## 🤗 Acknowledgements
 
