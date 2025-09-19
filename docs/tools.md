@@ -14,6 +14,7 @@
     - 由于此工具需要启动Jupyter Kernel，执行时间可能较长（10-30秒）。
     - 如果使用`connect`模式连接Notebook，则Notebook路径必须存在。
     - 如果使用`create`模式创建Notebook，则Notebook路径必须不存在。
+    - 如果使用`reconnect`模式重新连接Notebook，则Notebook路径必须与之前连接的Notebook路径相同。
     - 连接信息可以持久保存,但在MCP服务器重启后,连接的Notebook会丢失,需要重新连接。
 - **参数说明**:
 
@@ -23,7 +24,7 @@
 | `token` | `str` | 用于Jupyter服务认证的Token | |
 | `notebook_name` | `str` | 用于标识不同Notebook的唯一名称 | |
 | `notebook_path` | `str` | Notebook的相对路径 | |
-| `mode` | `Literal["connect", "create"]` | 连接模式。`connect`用于连接已存在的Notebook，`create`用于创建新的Notebook。 | `"connect"` |
+| `mode` | `Literal["connect", "create", "reconnect"]` | 连接模式。`connect`用于连接已存在的Notebook，`create`用于创建新的Notebook，`reconnect`用于重新连接已存在的Notebook。 | `"connect"` |
 
 ---
 

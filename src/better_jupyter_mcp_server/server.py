@@ -24,25 +24,35 @@ kernel_manager = {}
 #===========================================
 @mcp.tool(tags={"core","notebook","connect_notebook"})
 async def connect_notebook(
-    server_url: Annotated[str, "Jupyter server URL, e.g. http://localhost:8888"], 
-    token: Annotated[str, "Authentication Token"], 
-    notebook_name: Annotated[str, "Unique name for different notebooks"],
-    notebook_path: Annotated[str, "Notebook path (relative path)"],
+    server_url: Annotated[str, "Jupyter server URL (e.g., http://localhost:8888)"], 
+    token: Annotated[str, "Jupyter authentication token"], 
+    notebook_name: Annotated[str, "Unique identifier, used to reference this notebook in subsequent operations"],
+    notebook_path: Annotated[str, "Path to the notebook file relative to Jupyter server root (e.g., './analysis.ipynb')"],
     mode: Annotated[
-        Literal["connect", "create"], 
-        "connect: connect to an existing Notebook; create: create a new Notebook (not exist) and connect"
+        Literal["connect", "create", "reconnect"], 
+        "`connect`: connect to an existing notebook; `create`: create a new notebook (not exist) and connect; `reconnect`: reconnect to an existing notebook"
         ] = "connect") -> str:
     """
-    Connect to a Notebook and corresponding Kernel.
-    It is the FIRST STEP before using following tools.
+    Connect to a notebook and corresponding kernel. 
+    It is the FIRST STEP before ANY subsequent operations.
     """
     # 检查notebook是否已经连接
     # Check if the notebook is already connected
     if notebook_name in kernel_manager:
-        if kernel_manager[notebook_name]["notebook"]["path"] == notebook_path:
+        if mode == "reconnect":
+            if kernel_manager[notebook_name]["notebook"]["path"] == notebook_path:
+                try:
+                    kernel_manager[notebook_name]["kernel"].stop()
+                except Exception as e:
+                    pass
+                finally:
+                    del kernel_manager[notebook_name]
+            else:
+                return f"{notebook_name} should be connected to {kernel_manager[notebook_name]['notebook']['path']} not {notebook_path}!"
+        elif kernel_manager[notebook_name]["notebook"]["path"] == notebook_path:
             return f"{notebook_name} is already connected, please do not connect again"
         else:
-            return f"{notebook_name} name already exists, please rename it"
+            return f"{notebook_name} is already connected to {kernel_manager[notebook_name]['notebook']['path']}, please rename it"
     
     # 检查Jupyter与Kernel是否正常运行
     # Check if Jupyter and Kernel are running normally
@@ -52,7 +62,12 @@ async def connect_notebook(
         kernel.execute("print('Hello, World!')")
     except Exception as e:
         kernel.stop()
-        return f"""Jupyter environment connection failed! Error: {str(e)}
+        return f"""Jupyter environment connection failed! 
+        Error as below: 
+        ```
+        {str(e)}
+        ```
+        
         Please check: 
         1. Jupyter environment is successfully started 
         2. URL address is correct and can be accessed normally

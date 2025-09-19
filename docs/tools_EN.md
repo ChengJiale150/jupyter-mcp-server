@@ -14,6 +14,7 @@ This document provides a detailed introduction to all the tools offered by the J
     - This tool may take a long time to execute (10-30 seconds) as it needs to start a Jupyter Kernel.
     - If using `connect` mode, the Notebook path must exist.
     - If using `create` mode, the Notebook path must not exist.
+    - If using `reconnect` mode, the Notebook path must be the same as the previously connected Notebook path.
     - Connection information can be saved, but connected Notebooks will be lost after the MCP server restarts and will need to be reconnected.
 - **Parameters**:
 
@@ -23,7 +24,7 @@ This document provides a detailed introduction to all the tools offered by the J
 | `token` | `str` | The token for Jupyter service authentication. | |
 | `notebook_name` | `str` | A unique name to identify the Notebook. | |
 | `notebook_path` | `str` | The relative path to the Notebook. | |
-| `mode` | `Literal["connect", "create"]` | The connection mode. `connect` is for existing Notebooks, `create` is for new ones. | `"connect"` |
+| `mode` | `Literal["connect", "create", "reconnect"]` | The connection mode. `connect` is for existing Notebooks, `create` is for new ones, `reconnect` is for reconnecting to an existing Notebook. | `"connect"` |
 
 ---
 
