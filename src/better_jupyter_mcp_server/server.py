@@ -1,4 +1,4 @@
-import asyncio, tomllib
+import asyncio, tomllib, difflib
 from pathlib import Path
 from fastmcp import FastMCP
 from typing import Annotated, Literal
@@ -7,11 +7,12 @@ server_path = Path(__file__).parent
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
 from .utils import list_cell_basic, Cell, format_table, format_notebook, sync_notebook
+from . import __version__
 with open(server_path / "config.toml", "rb") as f:
     config = tomllib.load(f)
 FORCE_SYNC = config["basic"]["FORCE_SYNC"]
 
-mcp = FastMCP(name="Jupyter-MCP-Server", version="1.1.0")
+mcp = FastMCP(name="Jupyter-MCP-Server", version=__version__)
 
 # 用于管理不同notebook的kernel
 # Used to manage different notebooks' kernels
@@ -65,7 +66,7 @@ async def connect_notebook(
             return f"Notebook path does not exist, please check if the path is correct"
         elif exist_result["output_type"] == "error":
             kernel.stop()
-            return f"Error: {exist_result["output"]}"
+            return f"Error: {exist_result['output']}"
     elif mode == "create":
         if (exist_result["output_type"] == "execute_result") and ("True" in exist_result["output"]):
             kernel.stop()
@@ -74,7 +75,7 @@ async def connect_notebook(
         create_result = Cell(kernel.execute(create_code)).get_output_info(0)
         if create_result["output_type"] == "error":
             kernel.stop()
-            return f"Error: {create_result["output"]}"
+            return f"Error: {create_result['output']}"
     
     # 尝试连接notebook
     # Try to connect to the notebook
@@ -323,6 +324,7 @@ async def overwrite_cell(
     cell_content: str) -> str:
     """
     Overwrite the content of a specific cell
+    It will return a comparison (diff style, `+` for new lines, `-` for deleted lines) of the cell's content.
     """
     if notebook_name not in kernel_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
@@ -338,8 +340,11 @@ async def overwrite_cell(
             sync_notebook(notebook, 
                         kernel_manager[notebook_name]["notebook"]["path"],
                         kernel_manager[notebook_name]["kernel"])
+        
+        diff = difflib.unified_diff(raw_content.splitlines(keepends=False), cell_content.splitlines(keepends=False))
+        diff = "\n".join(list(diff)[3:])
 
-    return f"Overwrite successful!\n\nOriginal content:\n{raw_content}\n\nNew content:\n{cell_content}"
+    return f"Overwrite successful!\n\n```diff\n{diff}\n```"
 
 #===========================================
 # Cell高级集成功能模块(2个)

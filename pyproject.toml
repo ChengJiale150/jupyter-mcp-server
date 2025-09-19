@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "better-jupyter-mcp-server"
-version = "1.1.0"
+dynamic = ["version"]
 description = "A powerful MCP server for AI-driven Jupyter Notebook management and execution"
 readme = "README.md"
 license = {text = "MIT"}
@@ -50,6 +50,9 @@ Issues = "https://github.com/ChengJiale150/jupyter-mcp-server/issues"
 
 [project.scripts]
 better-jupyter-mcp-server = "better_jupyter_mcp_server.server:main"
+
+[tool.hatch.version]
+path = "src/better_jupyter_mcp_server/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/better_jupyter_mcp_server"]

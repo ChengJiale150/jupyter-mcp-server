@@ -1,79 +1,106 @@
-name: Publish to PyPI and MCP Registry
+# 自动发布到 PyPI 的工作流
+name: Publish to PyPI
 
+# 触发条件：当推送带有版本标签时自动发布
 on:
   push:
     tags:
-      - "v*"
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to publish'
-        required: true
-        default: '1.1.0'
+      - 'v*'  # 匹配所有以 'v' 开头的标签，如 v1.0.0, v1.2.3
+  workflow_dispatch:  # 允许手动触发
+
+permissions:
+  contents: read
 
 jobs:
+  # 构建和发布任务
   build-and-publish:
+    name: Build and publish Python distribution to PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/better-jupyter-mcp-server
     permissions:
-      contents: read
-      id-token: write  # 用于PyPI trusted publishing
-    
+      id-token: write
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-        
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      
-    - name: Install dependencies
-      run: uv sync
-      
-    - name: Build package
-      run: uv build
-      
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        skip-existing: true
-        
-    - name: Install MCP Publisher
-      run: |
-        curl -L "https://github.com/modelcontextprotocol/registry/releases/download/v1.0.0/mcp-publisher_1.0.0_linux_amd64.tar.gz" | tar xz
-        chmod +x mcp-publisher
-        sudo mv mcp-publisher /usr/local/bin/
-        
-    - name: Validate server.json
-      run: |
-        python -c "
-        import json
-        import jsonschema
-        import requests
-        
-        with open('server.json', 'r') as f:
-            server_data = json.load(f)
-            
-        schema_url = server_data['\$schema']
-        response = requests.get(schema_url)
-        schema = response.json()
-        
-        jsonschema.validate(server_data, schema)
-        print('✅ server.json validation passed')
-        "
-        
-    - name: Authenticate with MCP Registry (GitHub)
-      run: |
-        echo "${{ secrets.GITHUB_TOKEN }}" | mcp-publisher login github --token-stdin
-        
-    - name: Publish to MCP Registry
-      run: |
-        mcp-publisher publish
-        
-    - name: Verify publication
-      run: |
-        sleep 10  # 等待注册表更新
-        curl -f "https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ChengJiale150/jupyter-mcp-server" || echo "Server not found yet, may take time to propagate"
+      # 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 设置 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 安装 uv 包管理器
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      # 验证版本标签
+      - name: Verify version tag
+        run: |
+          # 从 __init__.py 文件中提取版本
+          VERSION=$(python -c "exec(open('src/better_jupyter_mcp_server/__init__.py').read()); print(__version__)")
+          echo "Package version: $VERSION"
+          
+          # 获取 Git 标签版本（去掉 'v' 前缀）
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Tag version: $TAG_VERSION"
+          
+          # 验证版本是否匹配
+          if [ "$VERSION" != "$TAG_VERSION" ]; then
+            echo "Error: Package version ($VERSION) does not match tag version ($TAG_VERSION)"
+            exit 1
+          fi
+          echo "Version verification passed!"
+
+      # 构建 Python 包
+      - name: Build package
+        run: |
+          echo "Building Python package..."
+          uv build
+          echo "Build completed successfully!"
+          
+          # 显示构建结果
+          echo "Built files:"
+          ls -la dist/
+
+      # 检查包的完整性
+      - name: Check package
+        run: |
+          echo "Checking package integrity..."
+          uv run twine check dist/*
+          echo "Package check completed!"
+
+      # 发布到 PyPI（使用 OIDC 可信发布）
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          verbose: true
+
+  # 验证发布成功的任务
+  verify-publication:
+    name: Verify PyPI publication
+    runs-on: ubuntu-latest
+    needs: build-and-publish
+    steps:
+      - name: Wait for PyPI propagation
+        run: sleep 60  # 等待 PyPI 更新
+
+      - name: Verify package on PyPI
+        run: |
+          # 从标签中提取版本号
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "Verifying version $VERSION on PyPI..."
+          
+          # 尝试从 PyPI 获取包信息
+          pip index versions better-jupyter-mcp-server
+          
+          # 尝试安装刚发布的版本
+          pip install better-jupyter-mcp-server==$VERSION
+          
+          echo "✅ Package successfully published and available on PyPI!"

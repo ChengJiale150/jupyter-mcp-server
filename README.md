@@ -12,8 +12,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
-[![pypi](https://img.shields.io/pypi/v/better-jupyter-mcp-server)](https://pypi.org/project/better-jupyter-mcp-server/)
+[![Version](https://img.shields.io/pypi/v/better-jupyter-mcp-server.svg)](https://pypi.org/project/better-jupyter-mcp-server/)
 [![mcp-registry](https://img.shields.io/badge/mcp--registry-v1.1.0-blue)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ChengJiale150/jupyter-mcp-server)
 
 [English](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/README_EN.md) | 中文

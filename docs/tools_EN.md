@@ -146,7 +146,7 @@ This document provides a detailed introduction to all the tools offered by the J
 ### `overwrite_cell`
 
 - **Function**: Overwrites (modifies) the content of a cell at a specified index in a Notebook.
-- **Output**: Returns a comparison of the cell's content before and after overwriting.
+- **Output**: Returns a comparison (diff style, `+` for new lines, `-` for deleted lines) of the cell's content.
 - **Important Notes**: Used to modify the code or text of an existing cell.
 - **Parameters**:
 

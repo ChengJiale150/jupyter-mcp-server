@@ -4,7 +4,7 @@
 
 # 🪐 Jupyter MCP Server
 
-<img title="cover" src="https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/assets/cover.png" alt="Jupyter MCP Server" data-align="center" width="700">
+<img title="cover" src="https://raw.githubusercontent.com/ChengJiale150/jupyter-mcp-server/main/assets/cover.png" alt="Jupyter MCP Server" data-align="center" width="700">
 
 **An MCP service specifically developed for AI to connect and manage Jupyter Notebooks**
 
@@ -12,8 +12,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-v1.1.0-blue.svg)](https://github.com/ChengJiale150/Jupyter-MCP-Server)
-[![pypi](https://img.shields.io/pypi/v/better-jupyter-mcp-server)](https://pypi.org/project/better-jupyter-mcp-server/)
+[![Version](https://img.shields.io/pypi/v/better-jupyter-mcp-server.svg)](https://pypi.org/project/better-jupyter-mcp-server/)
 [![mcp-registry](https://img.shields.io/badge/mcp--registry-v1.1.0-blue)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.ChengJiale150/jupyter-mcp-server)
 
 English | [中文](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/README.md)
