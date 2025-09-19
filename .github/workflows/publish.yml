@@ -44,16 +44,16 @@ jobs:
       - name: Verify version tag
         run: |
           # 从 __init__.py 文件中提取版本
-          VERSION=$(python -c "
+          VERSION=$(python -c '
           import re
-          with open('src/better_jupyter_mcp_server/__init__.py', 'r') as f:
+          with open("src/better_jupyter_mcp_server/__init__.py", "r") as f:
               content = f.read()
-          version_match = re.search(r'__version__\s*=\s*[\"\'']([^\"\']+)[\"\'']', content)
+          version_match = re.search(r"__version__.*?([0-9]+\.[0-9]+\.[0-9]+)", content)
           if version_match:
               print(version_match.group(1))
           else:
-              raise ValueError('Version not found in __init__.py')
-          ")
+              raise ValueError("Version not found in __init__.py")
+          ')
           echo "Package version: $VERSION"
           
           # 获取 Git 标签版本（去掉 'v' 前缀）
