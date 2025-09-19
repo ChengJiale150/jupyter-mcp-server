@@ -82,7 +82,7 @@ jobs:
       - name: Check package
         run: |
           echo "Checking package integrity..."
-          uv run twine check dist/*
+          uv run --with twine twine check dist/*
           echo "Package check completed!"
 
       # 发布到 PyPI（使用 OIDC 可信发布）
