@@ -18,12 +18,14 @@ class Cell:
     def __init__(self, cell: dict):
         self.cell = cell
     
-    def _strip_ansi_codes(self, text: str) -> str:
+    def _strip_ansi_codes(self, text: str | list[str]) -> str:
         """
         删除ANSI转义序列
         Remove ANSI escape sequences from text
         """
         ansi_escape = re.compile(r'\x1b\[[0-9;]*m')
+        if isinstance(text, list):
+            text = "\n".join(text)
         return ansi_escape.sub('', text)
     
     def _preprocess_image(self, image_data: bytes) -> bytes:
