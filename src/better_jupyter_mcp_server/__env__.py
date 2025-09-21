@@ -85,7 +85,7 @@ FORCE_SYNC: bool = _get_env_bool("FORCE_SYNC", _config["basic"]["FORCE_SYNC"])
 # 图片配置 / Image Configuration
 MAX_WIDTH: int = _get_env_int("MAX_WIDTH", _config["img"]["MAX_WIDTH"])
 MAX_HEIGHT: int = _get_env_int("MAX_HEIGHT", _config["img"]["MAX_HEIGHT"])
-PIXIV_TOKEN: int = _get_env_int("PIXIV_TOKEN", _config["img"]["PIXIV_TOKEN"])
+IMAGE_TOEKN_SIZE: int = _get_env_int("IMAGE_TOEKN_SIZE", _config["img"]["IMAGE_TOEKN_SIZE"])
 
 def get_config() -> Dict[str, Any]:
     """
