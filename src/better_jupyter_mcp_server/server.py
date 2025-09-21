@@ -1,16 +1,12 @@
-import asyncio, tomllib, difflib
-from pathlib import Path
+import asyncio, difflib
 from fastmcp import FastMCP
 from typing import Annotated, Literal
 from fastmcp.utilities.types import Image
-server_path = Path(__file__).parent
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
 from .utils import list_cell_basic, Cell, format_table, format_notebook, sync_notebook
 from . import __version__
-with open(server_path / "config.toml", "rb") as f:
-    config = tomllib.load(f)
-FORCE_SYNC = config["basic"]["FORCE_SYNC"]
+from .__env__ import FORCE_SYNC
 
 mcp = FastMCP(name="Jupyter-MCP-Server", version=__version__)
 

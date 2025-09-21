@@ -1,18 +1,8 @@
-import re, base64, tomllib, io
+import re, base64, io
 from fastmcp.utilities.types import Image
 from typing import Any
-from pathlib import Path
 from PIL import Image as PILImage
-server_path = Path(__file__).parent.parent
-
-with open(server_path / "config.toml", "rb") as f:
-    config = tomllib.load(f)
-
-ALLOW_IMG = config["basic"]["ALLOW_IMG"]
-ALLOW_IMG_PREPROCESS = config["basic"]["ALLOW_IMG_PREPROCESS"]
-MAX_WIDTH = config["img"]["MAX_WIDTH"]
-MAX_HEIGHT = config["img"]["MAX_HEIGHT"]
-PIXIV_TOKEN = config["img"]["PIXIV_TOKEN"]
+from ..__env__ import ALLOW_IMG, ALLOW_IMG_PREPROCESS, MAX_WIDTH, MAX_HEIGHT, PIXIV_TOKEN
 
 class Cell:
     def __init__(self, cell: dict):
