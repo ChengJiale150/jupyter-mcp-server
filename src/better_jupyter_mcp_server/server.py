@@ -147,7 +147,9 @@ async def restart_notebook(
 
 @mcp.tool(tags={"core","notebook","read_notebook"})
 async def read_notebook(
-    notebook_name: str) -> str:
+    notebook_name: str,
+    start_index: Annotated[int, "Starting cell index (0-based) for pagination"] = 0,
+    limit: Annotated[int, "Maximum number of cells to return (0 means no limit)"] = 20) -> str:
     """
     Read the source content (without output) of a connected Notebook.
     It will return the formatted content of the Notebook (including Index, Cell Type, Execution Count and Full Source Content).
@@ -159,11 +161,19 @@ async def read_notebook(
     ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
     async with NbModelClient(ws_url) as notebook:
         ydoc = notebook._doc
+        total_cells = len(ydoc._ycells)
+        
+        # Validate start_index
+        if start_index < 0 or start_index >= total_cells:
+            return f"Start index {start_index} out of range, Notebook has {total_cells} cells"
+        
+        end_index = min(start_index + limit, total_cells) if limit > 0 else total_cells
+        
         cells = [
             Cell(ydoc.get_cell(i))
-            for i in range(len(ydoc._ycells))
+            for i in range(start_index, end_index)
         ]
-        formatted_content = format_notebook(cells)
+        formatted_content = format_notebook(cells, start_index, total_cells)
     return formatted_content
 
 #===========================================

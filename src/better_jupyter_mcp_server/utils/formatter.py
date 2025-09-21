@@ -29,16 +29,31 @@ def format_table(headers: list[str], rows: list[list[str]]) -> str:
     
     return "\n".join(result)
 
-def format_notebook(cells: list[Cell]) -> str:
+def format_notebook(cells: list[Cell], start_index: int = 0, total_cells: int = None) -> str:
     """
-    格式化Notebook中的所有Cell
-    Format a list of cells into a notebook
+    格式化Notebook中的所有Cell，支持分页显示
+    Format a list of cells into a notebook with pagination support
+    
+    Args:
+        cells: Cell列表 / List of cells
+        start_index: 起始索引 / Starting index for pagination
+        total_cells: 总Cell数量 / Total number of cells in the notebook
     """
     result = []
-    for index, cell in enumerate(cells):
+    
+    # 添加分页信息头部
+    # Add pagination header information
+    if total_cells is not None:
+        end_index = start_index + len(cells) - 1
+        pagination_info = f"=====Showing cells {start_index}-{end_index} of {total_cells} total cells====="
+        result.append(pagination_info)
+        result.append("")
+    
+    for relative_index, cell in enumerate(cells):
+        actual_index = start_index + relative_index
         if cell.get_type() == "code":
-            cell_header = f"=====Index: {index}, Type: {cell.get_type()}, Execution Count: {cell.get_execution_count()}=====\n"
+            cell_header = f"=====Index: {actual_index}, Type: {cell.get_type()}, Execution Count: {cell.get_execution_count()}=====\n"
         else:
-            cell_header = f"=====Index: {index}, Type: {cell.get_type()}=====\n"
+            cell_header = f"=====Index: {actual_index}, Type: {cell.get_type()}=====\n"
         result.append(cell_header+cell.get_source()+"\n\n")
     return "\n".join(result)

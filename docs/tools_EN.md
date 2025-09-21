@@ -52,14 +52,19 @@ This document provides a detailed introduction to all the tools offered by the J
 
 ### `read_notebook`
 
-- **Function**: Reads the source content (without output) of a connected Notebook.
-- **Output**: Returns the source content of the Notebook (including index, type, execution count, and full source code).
-- **Important Notes**: Only used when the user explicitly instructs to read the full content of the Notebook.
+- **Function**: Reads the source content (without output) of a connected Notebook with pagination support.
+- **Output**: Returns the source content of the Notebook (including index, type, execution count, and full source code) with pagination support to avoid returning too much content at once.
+- **Important Notes**: 
+    - Only used when the user explicitly instructs to read the full content of the Notebook.
+    - Supports pagination functionality through `start_index` and `limit` parameters to control the range of cells returned.
+    - When the Notebook contains a large number of cells, it is recommended to use pagination to read in batches.
 - **Parameters**:
 
 | Parameter | Type | Description | Default |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | The name of the Notebook to read. | |
+| `start_index` | `int` | Starting cell index (0-based) for pagination. | `0` |
+| `limit` | `int` | Maximum number of cells to return (0 means no limit). | `20` |
 
 ## Basic Cell Function Module
 
