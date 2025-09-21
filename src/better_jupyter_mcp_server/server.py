@@ -93,7 +93,7 @@ async def connect_notebook(
     try:
         ws_url = get_jupyter_notebook_websocket_url(server_url=server_url, token=token, path=notebook_path)
         async with NbModelClient(ws_url) as notebook:
-            list_info = list_cell_basic(notebook)
+            list_info = list_cell_basic(notebook, limit=20)
     except Exception as e:
         kernel.stop()
         return f"Notebook connection failed! Error: {e}"
@@ -109,7 +109,7 @@ async def connect_notebook(
             "path": notebook_path
         }
     }
-    return_info = f"{notebook_name} connection successful!\nCell basic information:\n{list_info}"
+    return_info = f"{notebook_name} connection successful!\nTop 20 Cell basic information:\n{list_info}"
     return return_info
 
 @mcp.tool(tags={"core","notebook","list_notebook"})
@@ -183,9 +183,11 @@ async def read_notebook(
 
 @mcp.tool(tags={"core","cell","list_cell"})
 async def list_cell(
-    notebook_name: str) -> str:
+    notebook_name: str,
+    start_index: Annotated[int, "Starting cell index (0-based) for pagination"] = 0,
+    limit: Annotated[int, "Maximum number of cells to return (0 means no limit)"] = 50) -> str:
     """
-    List the basic information of all cells.
+    List the basic information of cells.
     It will return Index, Type, Execution Count and First Line of the Cell.
     It will be used to quickly overview the structure and current status of the Notebook or locate the index of specific cells for following operations(e.g. delete, insert).
     """
@@ -194,7 +196,7 @@ async def list_cell(
     
     ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
     async with NbModelClient(ws_url) as notebook: 
-        table = list_cell_basic(notebook, with_count=True)
+        table = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
     return table
 
 @mcp.tool(tags={"core","cell","read_cell"})

@@ -7,7 +7,7 @@
 ### `connect_notebook`
 
 - **作用**: 连接或创建指定路径的Notebook。
-- **输出内容**: 成功连接或创建Notebook后，返回Notebook的Cell基本信息(如Cell的索引、类型、首行内容等)
+- **输出内容**: 成功连接或创建Notebook后，返回Notebook的前20个Cell基本信息(如Cell的索引、类型、首行内容等)
 - **必要说明**: 
     - 需要在提示词中提供Jupyter服务连接参数(URL地址和Token),否则工具无法正常工作。
     - `notebook_name`用于标识不同Notebook的唯一名称,必须唯一。
@@ -69,16 +69,20 @@
 
 ### `list_cell`
 
-- **作用**: 列出指定Notebook中所有Cell的基本信息。
-- **输出内容**: Notebook的Cell基本信息(如Cell的索引、类型、执行计数、首行内容等)
+- **作用**: 列出指定Notebook中所有Cell的基本信息，支持分页功能。
+- **输出内容**: Notebook的Cell基本信息(如Cell的索引、类型、执行计数、首行内容等)，支持分页显示以避免一次性返回过多内容。
 - **必要说明**: 
     - 用于快速概览Notebook的结构与状态，定位特定Cell的索引和内容类型。
     - 为了节省Token消耗,仅返回首行内容,因此推荐在首行内容中包含足够的信息(如该Cell的作用),方便AI定位具体Cell。
+    - 支持分页功能，可以通过`start_index`和`limit`参数控制返回的Cell范围。
+    - 当Notebook包含大量Cell时，建议使用分页功能分批查看。
 - **参数说明**:
 
 | 参数名 | 类型 | 说明 | 默认值 |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | Notebook的名称 | |
+| `start_index` | `int` | 起始Cell索引(从0开始)，用于分页 | `0` |
+| `limit` | `int` | 最大返回的Cell数量(0表示无限制) | `50` |
 
 ---
 

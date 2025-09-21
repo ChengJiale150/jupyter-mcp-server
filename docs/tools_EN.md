@@ -7,7 +7,7 @@ This document provides a detailed introduction to all the tools offered by the J
 ### `connect_notebook`
 
 - **Function**: Connects to or creates a Notebook at a specified path.
-- **Output**: Upon successful connection or creation, it returns basic information about the Notebook's cells (e.g., cell index, type, first line of content).
+- **Output**: Upon successful connection or creation, it returns basic information about the Notebook's Top 20 cells (e.g., cell index, type, first line of content).
 - **Important Notes**:
     - You must provide the Jupyter service connection parameters (URL and Token) in the prompt; otherwise, the tool will not work correctly.
     - `notebook_name` is a unique identifier for different Notebooks and must be unique.
@@ -70,16 +70,20 @@ This document provides a detailed introduction to all the tools offered by the J
 
 ### `list_cell`
 
-- **Function**: Lists basic information for all cells in a specified Notebook.
-- **Output**: Basic information about the Notebook's cells (e.g., cell index, type, execution count, first line of content).
+- **Function**: Lists basic information for all cells in a specified Notebook with pagination support.
+- **Output**: Basic information about the Notebook's cells (e.g., cell index, type, execution count, first line of content) with pagination support to avoid returning too much content at once.
 - **Important Notes**:
     - Used for a quick overview of the Notebook's structure and status, and to locate the index and content type of specific cells.
     - To save on token consumption, only the first line of content is returned. It is recommended to include enough information in the first line (e.g., the purpose of the cell) to help the AI locate specific cells.
+    - Supports pagination functionality through `start_index` and `limit` parameters to control the range of cells returned.
+    - When the Notebook contains a large number of cells, it is recommended to use pagination to view in batches.
 - **Parameters**:
 
 | Parameter | Type | Description | Default |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | The name of the Notebook. | |
+| `start_index` | `int` | Starting cell index (0-based) for pagination. | `0` |
+| `limit` | `int` | Maximum number of cells to return (0 means no limit). | `50` |
 
 ---
 
