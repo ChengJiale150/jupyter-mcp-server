@@ -164,11 +164,15 @@ For specific client integration, please see the [Integration Documentation](http
 
 </details>
 
-### Starting Jupyter
+### Using Jupyter MCP Server
+
+<details>
+
+<summary>Manually Start Jupyter Server Locally</summary>
 
 Before formal use, you need to connect to a Jupyter Server. Here is how to start a Jupyter Server locally:
 
-1.  **Open a terminal and activate the environment**:
+1. **Open a terminal and activate the environment**:
 
     Open your computer's terminal command line and activate the environment.
 
@@ -186,36 +190,88 @@ Before formal use, you need to connect to a Jupyter Server. Here is how to start
     cd your/path/to/your/project
     ```
 
-2.  **Install necessary dependencies**:
+2. **Install necessary dependencies**:
 
     ```bash
     pip uninstall -y pycrdt datalayer_pycrdt
     pip install jupyter nbformat datalayer_pycrdt jupyter-collaboration
     ```
 
-3.  **Start Jupyter Server**:
+3. **Start Jupyter Server**:
 
-    Use the following command to start the Jupyter Server, where `YOUR_TOKEN` is the authentication token, which you can change.
+    Use the following command to start the Jupyter Server.
 
     ```bash
-    jupyter lab --port 8888 --IdentityProvider.token YOUR_TOKEN
+    jupyter lab
     ```
 
     After a successful start, a browser window will pop up. You can check if the root path is your project directory.
 
-### Using Jupyter MCP Server
+4. **Get Authentication Token**:
 
-Before formal use, you **must** add the following prompt to your rules file to provide the necessary connection information for Jupyter MCP Server:
+    Use the following command to get the authentication token.
 
+    ```bash
+    jupyter server list
+    ```
+
+    The output will be similar to this:
+
+    ```bash
+    http://localhost:8888/?token=YOUR_TOKEN :: YOUR_PROJECT_PATH
+    ```
+
+    Where `YOUR_TOKEN` is the authentication token.
+
+5. **Add Prompt and Rules**
+
+    Before formal use, you **must** add the following prompt to your rules file to provide the necessary connection information for Jupyter MCP Server:
+
+    ```
+    Here are the Jupyter server connection parameters:
+    URL = http://localhost:8888
+    Token = YOUR_TOKEN
+    ```
+
+    Additionally, it is recommended to add key Notebook path information to the prompt to help the AI quickly locate the target Notebook and improve the execution efficiency of the `connect_notebook` tool. You can right-click the target Notebook file in Jupyter Lab and select `Copy Path` to get the relative path.
+
+    After providing the above content, you can start using Jupyter MCP Server!
+
+</details>
+
+<details>
+
+<summary>Use LLM to Manage Jupyter Server</summary>
+
+1. **Install necessary dependencies**:
+
+    ```bash
+    pip uninstall -y pycrdt datalayer_pycrdt
+    pip install jupyter nbformat datalayer_pycrdt jupyter-collaboration
+    ```
+
+2. **Provide prompt and rules documentation**:
+
+```markdown
+## Jupyter MCP Server Usage Guide
+
+Before using Jupyter MCP Server, you **must** complete the following steps:
+
+1. **Start Jupyter Server**:
+
+    Use the following command to start the Jupyter Server in a way that does not block the current terminal, for example:
+
+    - `Window`: `start /b jupyter lab`
+    - `MacOS/Linux`: `nohup jupyter lab &`
+
+2. **Get URL and Authentication Token**:
+
+    Use `jupyter server list` to get the URL and authentication token.
+
+    ONLY when completing the above steps, you can use Jupyter MCP Server.
 ```
-Here are the Jupyter server connection parameters:
-URL = http://localhost:8888
-Token = YOUR_TOKEN
-```
 
-Additionally, it is recommended to add key Notebook path information to the prompt to help the AI quickly locate the target Notebook and improve the execution efficiency of the `connect_notebook` tool. You can right-click the target Notebook file in Jupyter Lab and select `Copy Path` to get the relative path.
-
-After providing the above content, you can start using Jupyter MCP Server!
+</details>
 
 ## ✅ Best Practices
 

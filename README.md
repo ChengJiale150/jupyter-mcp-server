@@ -167,9 +167,13 @@ uv run fastmcp run src/better_jupyter_mcp_server/server.py
 
 </details>
 
-### 启动Jupyter
+### 使用Jupyter MCP Server
 
-在正式使用前,需要连接Jupyter Server,这里介绍如何在本地启动Jupyter Server:
+<details>
+
+<summary>本地手动启动Jupyter Server</summary>
+
+在正式使用前,需要连接Jupyter Server,这里介绍如何在本地手动启动Jupyter Server:
 
 1. **打开终端并激活环境**:
 
@@ -198,15 +202,31 @@ pip install jupyter nbformat datalayer_pycrdt jupyter-collaboration
 
 3. **启动Jupyter Server**:
 
-使用下述命令启动Jupyter Server,其中`YOUR_TOKEN`为认证Token,可自行修改
+使用下述命令启动Jupyter Server
 
 ```bash
-jupyter lab --port 8888 --IdentityProvider.token YOUR_TOKEN
+jupyter lab
 ```
 
 成功启动后会弹出浏览器窗口,你可以在此查看根路径是否为工程目录
 
-### 使用Jupyter MCP Server
+4. **获取认证Token**:
+
+使用下述命令获取认证Token
+
+```bash
+jupyter server list
+```
+
+运行后会输出类似如下信息:
+
+```bash
+http://localhost:8888/?token=YOUR_TOKEN :: YOUR_PROJECT_PATH
+```
+
+其中`YOUR_TOKEN`为认证Token
+
+5. **添加提示词与规则**
 
 在正式使用前,你**必须**添加如下提示词于规则文件中以提供Jupyter MCP Server的必要连接信息:
 
@@ -219,6 +239,41 @@ Token = YOUR_TOKEN
 此外,推荐在提示词中添加关键Notebook路径信息,方便AI快速定位目标Notebook提高`connect_notebook`工具的执行效率,可以在Jupyter Lab网页中右键点击目标Notebook文件,选择`Copy Path`获取相对路径
 
 在提供上述内容后,你就可以开始使用Jupyter MCP Server了!
+
+</details>
+
+<details>
+
+<summary>使用LLM托管Jupyter Server</summary>
+
+1. **安装必要依赖**:
+
+```bash
+pip uninstall -y pycrdt datalayer_pycrdt
+pip install jupyter nbformat datalayer_pycrdt jupyter-collaboration
+```
+
+2. **提供提示词与规则文档**:
+
+```markdown
+## Jupyter MCP Server 使用指南
+
+在正式使用Jupyter MCP Server前,你**必须**完成如下步骤:
+
+1. **启动Jupyter Server**:
+
+以不阻塞当前终端的方式在命令行终端中输入启动Jupyter Server,例如:
+- `Window`: `start /b jupyter lab`
+- `MacOS/Linux`: `nohup jupyter lab &`
+
+2. **获取URL与认证Token**:
+
+使用`jupyter server list`获取URL与认证Token
+
+仅当完成上述步骤后,你才可以使用Jupyter MCP Server
+```
+
+</details>
 
 ## ✅ 最佳实践
 
