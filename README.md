@@ -101,7 +101,9 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {},
+            "env": {
+                "ALLOW_IMG": "true"
+            },
             "transport": "stdio"
         }
     }

@@ -8,7 +8,9 @@
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {},
+            "env": {
+                "ALLOW_IMG": "true"
+            },
             "transport": "stdio"
         }
     }
@@ -16,6 +18,7 @@
 ```
 
 接下来在对应客户端里的MCP配置文件中添加MCP服务即可
+环境变量的配置详见[配置文档](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/src/better_jupyter_mcp_server/config.toml)
 
 <details>
 
@@ -106,7 +109,7 @@
 可以直接在终端中输入下述命令:
 
 ```bash
-gemini mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+gemini mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server -e ALLOW_IMG=true
 ```
 
 或者也可以在项目中`.gemini`文件夹下的`settings.json`文件中添加如下内容:
@@ -121,7 +124,9 @@ gemini mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {}
+            "env": {
+                "ALLOW_IMG": "true"
+            }
         }
     }
 }
@@ -136,7 +141,7 @@ gemini mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
 可以直接在终端中输入下述命令:
 
 ```bash
-qwen mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+qwen mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server -e ALLOW_IMG=true
 ```
 
 或者也可以在项目中`.qwen`文件夹下的`settings.json`文件中添加如下内容:
@@ -151,7 +156,9 @@ qwen mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {}
+            "env": {
+                "ALLOW_IMG": "true"
+            }
         }
     }
 }
@@ -166,7 +173,7 @@ qwen mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
 可以直接在终端中输入下述命令:
 
 ```bash
-claude mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+claude mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server -e ALLOW_IMG=true
 ```
 
 </details>
@@ -177,9 +184,12 @@ claude mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
 {
     "mcpServers":{
         "Jupyter-MCP-Server":{
-            "command": "uvx",
+            "command": "uv",
             "args": [
-                "better-jupyter-mcp-server"
+                "run",
+                "--directory",
+                "your/path/to/jupyter-mcp-server",
+                "src/better_jupyter_mcp_server/server.py"
             ],
             "env": {},
             "transport": "stdio"

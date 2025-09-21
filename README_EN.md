@@ -100,7 +100,9 @@ After installing uv, configure the MCP JSON format directly, as shown below:
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {},
+            "env": {
+                "ALLOW_IMG": "true"
+            },
             "transport": "stdio"
         }
     }

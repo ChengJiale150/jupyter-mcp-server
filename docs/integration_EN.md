@@ -8,7 +8,9 @@
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {},
+            "env": {
+                "ALLOW_IMG": "true"
+            },
             "transport": "stdio"
         }
     }
@@ -16,6 +18,7 @@
 ```
 
 Next, add the MCP service to the MCP configuration file in the corresponding client.
+Environment variable configuration details can be found in the [configuration document](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/src/better_jupyter_mcp_server/config.toml)
 
 <details>
 
@@ -106,7 +109,7 @@ Finally, save and close the `cline_mcp_settings.json` file. Go back and check if
 You can also input the following command in the terminal:
 
 ```bash
-gemini mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+gemini mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server -e ALLOW_IMG=true
 ```
 
 Or you can also add the following content to the `settings.json` file in the `.gemini` folder of your project:
@@ -121,7 +124,9 @@ Or you can also add the following content to the `settings.json` file in the `.g
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {}
+            "env": {
+                "ALLOW_IMG": "true"
+            }
         }
     }
 }
@@ -136,7 +141,7 @@ Or you can also add the following content to the `settings.json` file in the `.g
 You can also input the following command in the terminal:
 
 ```bash
-qwen mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+qwen mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server -e ALLOW_IMG=true
 ```
 
 Or you can also add the following content to the `settings.json` file in the `.qwen` folder of your project:
@@ -151,7 +156,9 @@ Or you can also add the following content to the `settings.json` file in the `.q
             "args": [
                 "better-jupyter-mcp-server"
             ],
-            "env": {}
+            "env": {
+                "ALLOW_IMG": "true"
+            }
         }
     }
 }
@@ -166,7 +173,7 @@ Or you can also add the following content to the `settings.json` file in the `.q
 You can also input the following command in the terminal:
 
 ```bash
-claude mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server
+claude mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server -e ALLOW_IMG=true
 ```
 
 </details>
