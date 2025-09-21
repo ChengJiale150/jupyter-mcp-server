@@ -69,7 +69,6 @@ async def connect_notebook(
         2. URL address is correct and can be accessed normally
         3. Token is correct"""
 
-
     exist_result = Cell(kernel.execute(f'from pathlib import Path\nPath("{notebook_path}").exists()')).get_output_info(0)
     if mode == "connect":
         if (exist_result["output_type"] == "execute_result") and ("True" not in exist_result["output"]):
@@ -109,7 +108,7 @@ async def connect_notebook(
             "path": notebook_path
         }
     }
-    return_info = f"{notebook_name} connection successful!\nTop 20 Cell basic information:\n{list_info}"
+    return_info = f"{notebook_name} connection successful!\n{list_info}"
     return return_info
 
 @mcp.tool(tags={"core","notebook","list_notebook"})
@@ -252,14 +251,26 @@ async def delete_cell(
             return f"Cell index {cell_index} out of range, Notebook has {len(ydoc._ycells)} cells"
         
         del ydoc._ycells[cell_index]
-        now_notebook_info = list_cell_basic(notebook)
+        
+        # Get surrounding cells info (5 above and 5 below the deleted position)
+        total_cells = len(ydoc._ycells)
+        start_index = max(0, cell_index - 5)
+        limit = 10 if total_cells > 0 else 0
+        
+        if total_cells > 0:
+            # Adjust start_index if we're near the end
+            if start_index + limit > total_cells:
+                start_index = max(0, total_cells - limit)
+            surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
+        else:
+            surrounding_info = "Notebook is now empty, no cells remaining"
 
         if FORCE_SYNC:
             sync_notebook(notebook, 
                           kernel_manager[notebook_name]["notebook"]["path"],
                           kernel_manager[notebook_name]["kernel"])
 
-    return f"Delete successful!\nCurrent Notebook's Cell information:\n{now_notebook_info}"
+    return f"Delete successful!\nSurrounding cells information:\n{surrounding_info}"
 
 @mcp.tool(tags={"core","cell","insert_cell"})
 async def insert_cell(
@@ -292,16 +303,23 @@ async def insert_cell(
             else:
                 notebook.insert_markdown_cell(cell_index, cell_content)
 
+        # Get surrounding cells info (5 above and 5 below the inserted position)
+        total_cells = len(notebook._doc._ycells)
+        start_index = max(0, cell_index - 5)
+        limit = min(10, total_cells)
+        
+        # Adjust start_index if we're near the end
+        if start_index + limit > total_cells:
+            start_index = max(0, total_cells - limit)
+        
+        surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
+
         if FORCE_SYNC:
             sync_notebook(notebook, 
                           kernel_manager[notebook_name]["notebook"]["path"],
                           kernel_manager[notebook_name]["kernel"])
         
-        now_notebook_info = list_cell_basic(notebook)
-        
-        
-        
-    return f"Insert successful!\nCurrent Notebook's Cell information:\n{now_notebook_info}"
+    return f"Insert successful!\nSurrounding cells information:\n{surrounding_info}"
 
 @mcp.tool(tags={"core","cell","execute_cell"})
 async def execute_cell(

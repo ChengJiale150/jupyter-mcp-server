@@ -107,10 +107,11 @@ This document provides a detailed introduction to all the tools offered by the J
 ### `delete_cell`
 
 - **Function**: Deletes a cell at a specified index in a Notebook.
-- **Output**: Returns the latest structure information of the Notebook after deletion.
+- **Output**: Returns basic information of cells surrounding the deletion operation (5 cells above and 5 cells below the deleted position, total 10 cells).
 - **Important Notes**:
     - Since this operation directly modifies the Notebook's structure, it is not recommended to delete multiple cells at once to avoid accidental deletion.
     - If you must delete multiple cells, explicitly tell the AI to delete them in descending order of their indices.
+    - To avoid returning too much information, only shows cell information around the deletion position.
 - **Parameters**:
 
 | Parameter | Type | Description | Default |
@@ -123,9 +124,10 @@ This document provides a detailed introduction to all the tools offered by the J
 ### `insert_cell`
 
 - **Function**: Inserts a new cell above or below a specified index in a Notebook.
-- **Output**: Returns the latest structure information of the Notebook after insertion.
+- **Output**: Returns basic information of cells surrounding the insertion operation (5 cells above and 5 cells below the inserted position, total 10 cells).
 - **Important Notes**:
     - Since this operation directly modifies the Notebook's structure, it is not recommended to insert multiple cells at once to avoid confusion in the insertion order.
+    - To avoid returning too much information, only shows cell information around the insertion position.
 - **Parameters**:
 
 | Parameter | Type | Description | Default |
