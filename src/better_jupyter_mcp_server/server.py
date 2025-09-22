@@ -250,6 +250,7 @@ async def delete_cell(
         if cell_index < 0 or cell_index >= len(ydoc._ycells):
             return f"Cell index {cell_index} out of range, Notebook has {len(ydoc._ycells)} cells"
         
+        deleted_cell_content = Cell(ydoc.get_cell(cell_index)).get_source()
         del ydoc._ycells[cell_index]
         
         # Get surrounding cells info (5 above and 5 below the deleted position)
@@ -270,16 +271,17 @@ async def delete_cell(
                           kernel_manager[notebook_name]["notebook"]["path"],
                           kernel_manager[notebook_name]["kernel"])
 
-    return f"Delete successful!\nSurrounding cells information:\n{surrounding_info}"
+    return f"Delete successful!\nDeleted cell content:\n{deleted_cell_content}\nSurrounding cells information:\n{surrounding_info}"
 
 @mcp.tool(tags={"core","cell","insert_cell"})
 async def insert_cell(
     notebook_name: str,
-    cell_index: Annotated[int, "Cell index to insert at (0-based). Use -1 to insert at the end."],
+    cell_index: Annotated[int, "Cell index to insert at (0-based)"],
     cell_type: Literal["code", "markdown"],
     cell_content: str) -> str:
     """
     Insert a cell at the specified index.
+    Using `append_execute_cell` as a alternative if you want to insert at the end of the notebook and then execute it.
     When inserting many cells, MUST insert them in ascending order of their index.
     """
     if notebook_name not in kernel_manager:
@@ -288,10 +290,6 @@ async def insert_cell(
     ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
     async with NbModelClient(ws_url) as notebook:
         total_cells = len(notebook._doc._ycells)
-        
-        # Handle -1 as shortcut for end insertion
-        if cell_index == -1:
-            cell_index = total_cells
         
         if cell_index < 0 or cell_index > total_cells:
             return f"Cell index {cell_index} out of range, Notebook has {total_cells} cells"

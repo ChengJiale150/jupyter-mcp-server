@@ -107,7 +107,7 @@ This document provides a detailed introduction to all the tools offered by the J
 ### `delete_cell`
 
 - **Function**: Deletes a cell at a specified index in a Notebook.
-- **Output**: Returns basic information of cells surrounding the deletion operation (5 cells above and 5 cells below the deleted position, total 10 cells).
+- **Output**: Returns basic information of cells surrounding the deletion operation (5 cells above and 5 cells below the deleted position, total 10 cells). Also returns the content of the deleted cell.
 - **Important Notes**:
     - Since this operation directly modifies the Notebook's structure, it is not recommended to delete multiple cells at once to avoid accidental deletion.
     - If you must delete multiple cells, explicitly tell the AI to delete them in descending order of their indices.
@@ -128,13 +128,12 @@ This document provides a detailed introduction to all the tools offered by the J
 - **Important Notes**:
     - Since this operation directly modifies the Notebook's structure, it is not recommended to insert multiple cells at once to avoid confusion in the insertion order.
     - To avoid returning too much information, only shows cell information around the insertion position.
-    - Use `-1` as a shortcut to insert at the end of the notebook.
 - **Parameters**:
 
 | Parameter | Type | Description | Default |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | The name of the Notebook. | |
-| `cell_index` | `int` | The index where to insert the cell (0-based). Use -1 to insert at the end. | |
+| `cell_index` | `int` | The index where to insert the cell (0-based). | |
 | `cell_type` | `Literal["code", "markdown"]` | The type of cell to insert. | |
 | `cell_content` | `str` | The content of the cell to insert. | |
 
