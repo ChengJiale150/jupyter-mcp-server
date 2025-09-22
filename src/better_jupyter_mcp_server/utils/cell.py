@@ -93,7 +93,10 @@ class Cell:
         return self.cell['cell_type']
     
     def get_source(self) -> str:
-        return self.cell['source']
+        if isinstance(self.cell['source'], list):
+            return "".join(self.cell['source'])
+        else:
+            return self.cell['source']
 
     def get_execution_count(self) -> int | str:
         return self.cell.get('execution_count', 'N/A')

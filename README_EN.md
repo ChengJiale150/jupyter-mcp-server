@@ -259,9 +259,9 @@ Before using Jupyter MCP Server, you **must** complete the following steps:
 
 1. **Start Jupyter Server**:
 
-    Use the following command to start the Jupyter Server in a way that does not block the current terminal, for example:
+    In the current project directory, use the following command to start the Jupyter Server in a way that does not block the current terminal, for example:
 
-    - `Window`: `start /b jupyter lab`
+    - `Window`: `start jupyter lab`
     - `MacOS/Linux`: `nohup jupyter lab &`
 
 2. **Get URL and Authentication Token**:

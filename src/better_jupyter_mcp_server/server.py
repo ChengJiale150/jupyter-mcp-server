@@ -375,7 +375,7 @@ async def overwrite_cell(
         if cell_index < 0 or cell_index >= len(notebook._doc._ycells):
             return f"Cell index {cell_index} out of range, Notebook has {len(notebook._doc._ycells)} cells"
         
-        raw_content = notebook._doc.get_cell(cell_index)['source']
+        raw_content = Cell(notebook._doc.get_cell(cell_index)).get_source()
         notebook.set_cell_source(cell_index, cell_content)
         if FORCE_SYNC:
             sync_notebook(notebook, 

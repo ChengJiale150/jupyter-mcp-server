@@ -262,8 +262,8 @@ pip install jupyter nbformat datalayer_pycrdt jupyter-collaboration
 
 1. **启动Jupyter Server**:
 
-以不阻塞当前终端的方式在命令行终端中输入启动Jupyter Server,例如:
-- `Window`: `start /b jupyter lab`
+在当前项目目录中以不阻塞当前终端的方式在命令行终端中输入启动Jupyter Server,例如:
+- `Window`: `start jupyter lab`
 - `MacOS/Linux`: `nohup jupyter lab &`
 
 2. **获取URL与认证Token**:
