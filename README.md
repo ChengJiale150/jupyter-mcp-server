@@ -133,7 +133,7 @@ uv sync
 3. **启动Jupyter MCP Server**
 
 ```bash
-uv run fastmcp run src/better_jupyter_mcp_server/server.py
+uv run fastmcp run src/main.py
 ```
 
 如果成功启动,会输出类似如下信息代表启动成功:
@@ -153,7 +153,7 @@ uv run fastmcp run src/better_jupyter_mcp_server/server.py
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {},
             "transport": "stdio"

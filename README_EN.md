@@ -131,7 +131,7 @@ For specific client integration, please see the [Integration Documentation](http
 3.  **Start Jupyter MCP Server**
 
     ```bash
-    uv run fastmcp run src/better_jupyter_mcp_server/server.py
+    uv run fastmcp run src/main.py
     ```
 
     If it starts successfully, you will see output similar to this:
@@ -151,7 +151,7 @@ For specific client integration, please see the [Integration Documentation](http
                     "run",
                     "--directory",
                     "your/path/to/jupyter-mcp-server",
-                    "src/better_jupyter_mcp_server/server.py"
+                    "src/main.py"
                 ],
                 "env": {},
                 "transport": "stdio"

@@ -81,7 +81,7 @@ class Cell:
             if ("image/png" in output['data']) and ALLOW_IMG:
                 raw_image_data = base64.b64decode(output['data']['image/png'])
                 processed_image_data = self._preprocess_image(raw_image_data)
-                return Image(data=processed_image_data, format="image/png")
+                return Image(data=processed_image_data, format="image/png").to_image_content()
             elif "text/plain" in output['data']:
                 return self._strip_ansi_codes(output['data']['text/plain'])
             else:

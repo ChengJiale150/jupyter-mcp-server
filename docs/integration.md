@@ -189,7 +189,7 @@ claude mcp add Jupyter-MCP-Server uvx better-jupyter-mcp-server -e ALLOW_IMG=tru
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -230,7 +230,7 @@ C:\\Users\\username\\Desktop\\MCP\\jupyter-mcp-server
                 "run",
                 "--directory",
                 "C:\\Users\\username\\Desktop\\MCP\\jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -261,7 +261,7 @@ C:\\Users\\username\\Desktop\\MCP\\jupyter-mcp-server
                 "run",
                 "--directory",
                 "/Users/username/Documents/mcp/jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -306,7 +306,7 @@ C:\\Users\\username\\Desktop\\MCP\\jupyter-mcp-server
                 "run",
                 "--directory",
                 "C:\\Users\\username\\Desktop\\MCP\\jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -343,7 +343,7 @@ pwd
                 "run",
                 "--directory",
                 "/Users/username/Documents/mcp/jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {},
             "transport": "stdio"
@@ -447,7 +447,7 @@ pwd
 可以直接在终端中输入下述命令:
 
 ```bash
-gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/better_jupyter_mcp_server/server.py
+gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/main.py
 ```
 
 或者也可以在项目中`.gemini`文件夹下的`settings.json`文件中添加如下内容:
@@ -463,7 +463,7 @@ gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-se
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {}
         }
@@ -480,7 +480,7 @@ gemini mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-se
 可以直接在终端中输入下述命令:
 
 ```bash
-qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/better_jupyter_mcp_server/server.py
+qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/main.py
 ```
 
 或者也可以在项目中`.qwen`文件夹下的`settings.json`文件中添加如下内容:
@@ -496,7 +496,7 @@ qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-serv
                 "run",
                 "--directory",
                 "your/path/to/jupyter-mcp-server",
-                "src/better_jupyter_mcp_server/server.py"
+                "src/main.py"
             ],
             "env": {}
         }
@@ -513,7 +513,7 @@ qwen mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-serv
 可以直接在终端中输入下述命令:
 
 ```bash
-claude mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/better_jupyter_mcp_server/server.py
+claude mcp add Jupyter-MCP-Server uv run --directory your/path/to/jupyter-mcp-server src/main.py
 ```
 
 </details>

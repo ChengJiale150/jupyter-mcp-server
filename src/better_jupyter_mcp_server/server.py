@@ -1,7 +1,7 @@
 import asyncio, difflib
 from fastmcp import FastMCP
 from typing import Annotated, Literal
-from fastmcp.utilities.types import Image
+from mcp.types import ImageContent
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
 from .utils import list_cell_basic, Cell, format_table, format_notebook, sync_notebook
@@ -202,7 +202,7 @@ async def list_cell(
 async def read_cell(
     notebook_name: str,
     cell_index: Annotated[int, "Cell index(0-based)"],
-    return_output: Annotated[bool, "Whether to return output"] = True) -> list[str | Image]:
+    return_output: Annotated[bool, "Whether to return output"] = True) -> list[str | ImageContent]:
     '''
     Read the detailed content of a specific cell.
     It will return the source code, execution count and output of the cell.
@@ -325,7 +325,7 @@ async def insert_cell(
 async def execute_cell(
     notebook_name: str,
     cell_index: Annotated[int, "Cell index(0-based)"],
-    timeout: Annotated[int, "seconds"] = 60) -> list[str | Image]:
+    timeout: Annotated[int, "seconds"] = 60) -> list[str | ImageContent]:
     """
     Execute a specific cell with a timeout.
     It will return the output of the cell.
@@ -397,7 +397,7 @@ async def append_execute_cell(
     notebook_name: str,
     cell_type: Literal["code", "markdown"],
     cell_content: str,
-    timeout: Annotated[int, "seconds"] = 60) -> list[str | Image]:
+    timeout: Annotated[int, "seconds"] = 60) -> list[str | ImageContent]:
     """
     Add a new cell to the end of a Notebook and immediately execute it.
     It will return the output of the cell.
@@ -439,7 +439,7 @@ async def append_execute_cell(
 @mcp.tool(tags={"advanced","cell","execute_temporary_cell"})
 async def execute_temporary_cell(
     notebook_name: str,
-    cell_content: str) -> list[str | Image]:
+    cell_content: str) -> list[str | ImageContent]:
     """
     Execute a temporary code block (not saved to the Notebook) and will return the output.
     
