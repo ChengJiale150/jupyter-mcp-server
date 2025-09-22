@@ -122,20 +122,20 @@
 
 ### `insert_cell`
 
-- **作用**: 在Notebook中指定索引的上方或下方插入一个新的Cell。
+- **作用**: 在Notebook中指定索引位置插入一个新的Cell。
 - **输出内容**: 返回插入操作周围Cell的基本信息(插入位置上下各5个Cell，共10个Cell)
 - **必要说明**: 
     - 插入操作会直接修改Notebook的结构,因此不推荐一次性插入多个Cell,以免插入顺序混乱
     - 为避免返回过多信息，仅显示插入位置周围的Cell信息
+    - 使用`-1`作为快捷方式在Notebook末尾插入Cell
 - **参数说明**:
 
 | 参数名 | 类型 | 说明 | 默认值 |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | Notebook的名称 | |
-| `cell_index` | `int` | 作为锚点的Cell的索引 | |
+| `cell_index` | `int` | 要插入Cell的索引位置(从0开始)。使用-1在末尾插入。 | |
 | `cell_type` | `Literal["code", "markdown"]` | 要插入的Cell的类型 | |
 | `cell_content` | `str` | 要插入的Cell的内容 | |
-| `direction` | `Literal["above", "below"]` | 在锚点索引的`上方`或`下方`插入 | `"below"` |
 
 ---
 

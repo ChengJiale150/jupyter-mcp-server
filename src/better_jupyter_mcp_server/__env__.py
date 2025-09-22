@@ -86,33 +86,3 @@ FORCE_SYNC: bool = _get_env_bool("FORCE_SYNC", _config["basic"]["FORCE_SYNC"])
 MAX_WIDTH: int = _get_env_int("MAX_WIDTH", _config["img"]["MAX_WIDTH"])
 MAX_HEIGHT: int = _get_env_int("MAX_HEIGHT", _config["img"]["MAX_HEIGHT"])
 IMAGE_TOEKN_SIZE: int = _get_env_int("IMAGE_TOEKN_SIZE", _config["img"]["IMAGE_TOEKN_SIZE"])
-
-def get_config() -> Dict[str, Any]:
-    """
-    获取完整的配置字典
-    Get the complete configuration dictionary
-    
-    Returns:
-        Dict[str, Any]: 完整的配置字典 / Complete configuration dictionary
-    """
-    return _config.copy()
-
-def get_basic_config() -> Dict[str, Any]:
-    """
-    获取基础配置
-    Get basic configuration
-    
-    Returns:
-        Dict[str, Any]: 基础配置字典 / Basic configuration dictionary
-    """
-    return _config["basic"].copy()
-
-def get_img_config() -> Dict[str, Any]:
-    """
-    获取图片配置
-    Get image configuration
-    
-    Returns:
-        Dict[str, Any]: 图片配置字典 / Image configuration dictionary
-    """
-    return _config["img"].copy()

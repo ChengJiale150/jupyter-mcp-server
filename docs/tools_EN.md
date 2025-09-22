@@ -123,20 +123,20 @@ This document provides a detailed introduction to all the tools offered by the J
 
 ### `insert_cell`
 
-- **Function**: Inserts a new cell above or below a specified index in a Notebook.
+- **Function**: Inserts a new cell at the specified index in a Notebook.
 - **Output**: Returns basic information of cells surrounding the insertion operation (5 cells above and 5 cells below the inserted position, total 10 cells).
 - **Important Notes**:
     - Since this operation directly modifies the Notebook's structure, it is not recommended to insert multiple cells at once to avoid confusion in the insertion order.
     - To avoid returning too much information, only shows cell information around the insertion position.
+    - Use `-1` as a shortcut to insert at the end of the notebook.
 - **Parameters**:
 
 | Parameter | Type | Description | Default |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | The name of the Notebook. | |
-| `cell_index` | `int` | The index of the anchor cell. | |
+| `cell_index` | `int` | The index where to insert the cell (0-based). Use -1 to insert at the end. | |
 | `cell_type` | `Literal["code", "markdown"]` | The type of cell to insert. | |
 | `cell_content` | `str` | The content of the cell to insert. | |
-| `direction` | `Literal["above", "below"]` | Whether to insert `above` or `below` the anchor index. | `"below"` |
 
 ---
 

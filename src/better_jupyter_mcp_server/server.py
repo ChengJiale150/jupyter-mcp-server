@@ -275,12 +275,11 @@ async def delete_cell(
 @mcp.tool(tags={"core","cell","insert_cell"})
 async def insert_cell(
     notebook_name: str,
-    cell_index: Annotated[int, "Anchor index(0-based)"],
+    cell_index: Annotated[int, "Cell index to insert at (0-based). Use -1 to insert at the end."],
     cell_type: Literal["code", "markdown"],
-    cell_content: str,
-    direction: Literal["above", "below"] = "below") -> str:
+    cell_content: str) -> str:
     """
-    Insert a cell above/below of a anchor index.
+    Insert a cell at the specified index.
     When inserting many cells, MUST insert them in ascending order of their index.
     """
     if notebook_name not in kernel_manager:
@@ -288,29 +287,34 @@ async def insert_cell(
     
     ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
     async with NbModelClient(ws_url) as notebook:
-        cell_index = cell_index + 1 if direction == "below" else cell_index
-        if cell_index < 0 or cell_index > len(notebook._doc._ycells):
-            return f"Cell index {cell_index} out of range, Notebook has {len(notebook._doc._ycells)} cells"
+        total_cells = len(notebook._doc._ycells)
+        
+        # Handle -1 as shortcut for end insertion
+        if cell_index == -1:
+            cell_index = total_cells
+        
+        if cell_index < 0 or cell_index > total_cells:
+            return f"Cell index {cell_index} out of range, Notebook has {total_cells} cells"
         
         if cell_type == "code":
-            if cell_index == len(notebook._doc._ycells):
+            if cell_index == total_cells:
                 notebook.add_code_cell(cell_content)
             else:
                 notebook.insert_code_cell(cell_index, cell_content)
         elif cell_type == "markdown":
-            if cell_index == len(notebook._doc._ycells):
+            if cell_index == total_cells:
                 notebook.add_markdown_cell(cell_content)
             else:
                 notebook.insert_markdown_cell(cell_index, cell_content)
 
         # Get surrounding cells info (5 above and 5 below the inserted position)
-        total_cells = len(notebook._doc._ycells)
+        new_total_cells = len(notebook._doc._ycells)
         start_index = max(0, cell_index - 5)
-        limit = min(10, total_cells)
+        limit = min(10, new_total_cells)
         
         # Adjust start_index if we're near the end
-        if start_index + limit > total_cells:
-            start_index = max(0, total_cells - limit)
+        if start_index + limit > new_total_cells:
+            start_index = max(0, new_total_cells - limit)
         
         surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
 
