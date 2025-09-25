@@ -124,21 +124,6 @@ class NotebookManager:
             return self._notebooks[name]["kernel"]
         return None
     
-    def get_notebook_info(self, name: str) -> Optional[Dict[str, str]]:
-        """
-        获取指定notebook的信息
-        Get the info of specified notebook
-        
-        Args:
-            name: notebook名称 / Notebook name
-            
-        Returns:
-            notebook信息字典或None / Notebook info dict or None
-        """
-        if name in self._notebooks:
-            return self._notebooks[name]["notebook"]
-        return None
-    
     def get_notebook_path(self, name: str) -> Optional[str]:
         """
         获取指定notebook的路径
