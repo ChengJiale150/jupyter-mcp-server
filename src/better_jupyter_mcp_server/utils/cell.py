@@ -1,7 +1,8 @@
 import re, base64, io
-from fastmcp.utilities.types import Image
 from typing import Any
+from fastmcp.utilities.types import Image
 from PIL import Image as PILImage
+
 from ..__env__ import ALLOW_IMG, ALLOW_IMG_PREPROCESS, MAX_WIDTH, MAX_HEIGHT, IMAGE_TOEKN_SIZE
 
 class Cell:

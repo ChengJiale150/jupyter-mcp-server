@@ -1,57 +1,11 @@
-from jupyter_nbmodel_client import NbModelClient
-from jupyter_kernel_client import KernelClient
-from .formatter import format_table
-from .cell import Cell
 import json, base64
+from typing import Dict, Any, Optional
+from types import TracebackType
 
-def list_cell_basic(notebook: NbModelClient, with_count: bool = False, start_index: int = 0, limit: int = 0) -> str:
-    """
-    列出Notebook中所有Cell的基本信息，支持分页功能
-    List the basic information of all cells in the notebook with pagination support
+from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
+from jupyter_kernel_client import KernelClient
 
-    Args:
-        notebook: Notebook对象 / The notebook object
-        with_count: 是否包含执行计数 / Whether to include the execution count
-        start_index: 起始Cell索引 / Starting cell index for pagination
-        limit: 最大返回Cell数量(0表示无限制) / Maximum number of cells to return (0 means no limit)
-    
-    Returns:
-        格式化的表格字符串 / The formatted table string
-    """
-    ydoc = notebook._doc
-    total_cell = len(ydoc._ycells)
-    
-    if total_cell == 0:
-        return "Notebook is empty, no Cell"
-    
-    # Validate start_index
-    if start_index < 0 or start_index >= total_cell:
-        return f"Start index {start_index} out of range, Notebook has {total_cell} cells"
-    
-    # Calculate end index
-    end_index = min(start_index + limit, total_cell) if limit > 0 else total_cell
-    
-    headers = ["Index", "Type", "Content"] if not with_count else ["Index", "Type", "Count", "Content"]
-    rows = []
-    
-    # Add pagination info if using pagination
-    pagination_info = ""
-    if limit > 0:
-        pagination_info = f"Showing cells {start_index}-{end_index-1} of {total_cell} total cells\n\n"
-    
-    for i in range(start_index, end_index):
-        cell = Cell(ydoc.get_cell(i))
-        cell_type = cell.get_type()
-        execution_count = cell.get_execution_count()
-        content_list = cell.get_source().split("\n")
-        cell_content = content_list[0] + "...(Hidden)" if len(content_list) > 1 else cell.get_source()
-        row = [i, cell_type, execution_count, cell_content] if with_count else [i, cell_type, cell_content]
-        rows.append(row)
-    
-    table = format_table(headers, rows)
-    return pagination_info + table
-
-def sync_notebook(notebook: NbModelClient, file_path: str, kernel: KernelClient) -> None:
+def _sync_notebook(notebook: NbModelClient, file_path: str, kernel: KernelClient) -> None:
     """
     Safely save the notebook content to the specified file path on the remote server.
     This function base64-encodes the notebook content and uses a static kernel command
@@ -80,3 +34,209 @@ except Exception as e:
 '''
 
     kernel.execute(script)
+
+class NotebookManager:
+    """
+    管理多个Notebook与对应的Kernel的类
+    Class for managing multiple Notebooks and their corresponding Kernels
+    """
+    
+    def __init__(self):
+        self._notebooks: Dict[str, Dict[str, Any]] = {}
+    
+    def __contains__(self, name: str) -> bool:
+        """
+        支持 in 语法检查notebook是否存在
+        Support 'in' syntax to check if notebook exists
+        
+        Args:
+            name: notebook名称 / Notebook name
+            
+        Returns:
+            是否存在 / Whether exists
+        """
+        return name in self._notebooks
+    
+    def add_notebook(self, name: str, kernel: KernelClient, server_url: str, token: str, path: str) -> None:
+        """
+        添加一个新的notebook
+        Add a new notebook
+        
+        Args:
+            name: notebook的唯一标识符 / Unique identifier for the notebook
+            kernel: kernel客户端 / Kernel client
+            server_url: Jupyter服务器URL / Jupyter server URL
+            token: 认证token / Authentication token
+            path: notebook文件路径 / Notebook file path
+        """
+        self._notebooks[name] = {
+            "kernel": kernel,
+            "notebook": {
+                "server_url": server_url,
+                "token": token,
+                "path": path
+            }
+        }
+    
+    def remove_notebook(self, name: str) -> bool:
+        """
+        删除一个notebook
+        Remove a notebook
+        
+        Args:
+            name: notebook名称 / Notebook name
+            
+        Returns:
+            是否成功删除 / Whether successfully removed
+        """
+        if name in self._notebooks:
+            try:
+                self._notebooks[name]["kernel"].stop()
+            except Exception:
+                pass
+            finally:
+                del self._notebooks[name]
+            return True
+        return False
+    
+    def get_kernel(self, name: str) -> Optional[KernelClient]:
+        """
+        获取指定notebook的kernel
+        Get the kernel of specified notebook
+        
+        Args:
+            name: notebook名称 / Notebook name
+            
+        Returns:
+            kernel客户端或None / Kernel client or None
+        """
+        if name in self._notebooks:
+            return self._notebooks[name]["kernel"]
+        return None
+    
+    def get_notebook_info(self, name: str) -> Optional[Dict[str, str]]:
+        """
+        获取指定notebook的信息
+        Get the info of specified notebook
+        
+        Args:
+            name: notebook名称 / Notebook name
+            
+        Returns:
+            notebook信息字典或None / Notebook info dict or None
+        """
+        if name in self._notebooks:
+            return self._notebooks[name]["notebook"]
+        return None
+    
+    def get_notebook_path(self, name: str) -> Optional[str]:
+        """
+        获取指定notebook的路径
+        Get the path of specified notebook
+        
+        Args:
+            name: notebook名称 / Notebook name
+            
+        Returns:
+            notebook路径或None / Notebook path or None
+        """
+        if name in self._notebooks:
+            return self._notebooks[name]["notebook"]["path"]
+        return None
+    
+    def get_all_notebooks(self) -> Dict[str, Dict[str, Any]]:
+        """
+        获取所有notebook信息
+        Get all notebooks info
+        
+        Returns:
+            所有notebook信息 / All notebooks info
+        """
+        return self._notebooks
+    
+    def restart_notebook(self, name: str) -> bool:
+        """
+        重启指定notebook的kernel
+        Restart the kernel of specified notebook
+        
+        Args:
+            name: notebook名称 / Notebook name
+            
+        Returns:
+            是否成功重启 / Whether successfully restarted
+        """
+        if name in self._notebooks:
+            self._notebooks[name]["kernel"].restart()
+            return True
+        return False
+    
+    def is_empty(self) -> bool:
+        """
+        检查是否为空
+        Check if empty
+        
+        Returns:
+            是否为空 / Whether empty
+        """
+        return len(self._notebooks) == 0
+    
+    def get_notebook_connection(self, name: str) -> 'NotebookConnection':
+        """
+        获取notebook连接的上下文管理器
+        Get notebook connection context manager
+        
+        Args:
+            name: notebook名称 / Notebook name
+            
+        Returns:
+            上下文管理器 / Context manager
+        """
+        if name not in self._notebooks:
+            raise ValueError(f"Notebook '{name}' does not exist")
+        
+        return NotebookConnection(self._notebooks[name]["notebook"])
+    
+    def sync_notebook(self, notebook: NbModelClient, notebook_name: str) -> None:
+        """
+        同步notebook到文件
+        Sync notebook to file
+        
+        Args:
+            notebook: notebook对象 / Notebook object
+            notebook_name: notebook名称 / Notebook name
+        """
+        if notebook_name not in self._notebooks:
+            raise ValueError(f"Notebook '{notebook_name}' does not exist")
+        
+        file_path = self._notebooks[notebook_name]["notebook"]["path"]
+        kernel = self._notebooks[notebook_name]["kernel"]
+        
+        # 使用原有的sync_notebook函数
+        _sync_notebook(notebook, file_path, kernel)
+
+class NotebookConnection:
+    """
+    Notebook连接的上下文管理器
+    Context manager for Notebook connections
+    """
+    
+    def __init__(self, notebook_info: Dict[str, str]):
+        self.notebook_info = notebook_info
+        self._notebook: Optional[NbModelClient] = None
+    
+    async def __aenter__(self) -> NbModelClient:
+        """进入上下文管理器 / Enter context manager"""
+        ws_url = get_jupyter_notebook_websocket_url(**self.notebook_info)
+        self._notebook = NbModelClient(ws_url)
+        await self._notebook.__aenter__()
+        return self._notebook
+    
+    async def __aexit__(
+        self, 
+        exc_type: Optional[type], 
+        exc_val: Optional[BaseException], 
+        exc_tb: Optional[TracebackType]
+    ) -> None:
+        """退出上下文管理器 / Exit context manager"""
+        if self._notebook:
+            await self._notebook.__aexit__(exc_type, exc_val, exc_tb)

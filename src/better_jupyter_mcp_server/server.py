@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 from mcp.types import ImageContent
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
-from .utils import list_cell_basic, Cell, format_table, format_notebook, sync_notebook
+from .utils import list_cell_basic, Cell, format_table, format_notebook, NotebookManager
 from . import __version__
 from .__env__ import FORCE_SYNC
 
@@ -12,7 +12,7 @@ mcp = FastMCP(name="Jupyter-MCP-Server", version=__version__)
 
 # 用于管理不同notebook的kernel
 # Used to manage different notebooks' kernels
-kernel_manager = {}
+notebook_manager = NotebookManager()
 
 #===========================================
 # Notebook管理模块(4个)
@@ -34,21 +34,16 @@ async def connect_notebook(
     """
     # 检查notebook是否已经连接
     # Check if the notebook is already connected
-    if notebook_name in kernel_manager:
+    if notebook_name in notebook_manager:
         if mode == "reconnect":
-            if kernel_manager[notebook_name]["notebook"]["path"] == notebook_path:
-                try:
-                    kernel_manager[notebook_name]["kernel"].stop()
-                except Exception as e:
-                    pass
-                finally:
-                    del kernel_manager[notebook_name]
+            if notebook_manager.get_notebook_path(notebook_name) == notebook_path:
+                notebook_manager.remove_notebook(notebook_name)
             else:
-                return f"{notebook_name} should be connected to {kernel_manager[notebook_name]['notebook']['path']} not {notebook_path}!"
-        elif kernel_manager[notebook_name]["notebook"]["path"] == notebook_path:
+                return f"{notebook_name} should be connected to {notebook_manager.get_notebook_path(notebook_name)} not {notebook_path}!"
+        elif notebook_manager.get_notebook_path(notebook_name) == notebook_path:
             return f"{notebook_name} is already connected, please do not connect again"
         else:
-            return f"{notebook_name} is already connected to {kernel_manager[notebook_name]['notebook']['path']}, please rename it"
+            return f"{notebook_name} is already connected to {notebook_manager.get_notebook_path(notebook_name)}, please rename it"
     
     # 检查Jupyter与Kernel是否正常运行
     # Check if Jupyter and Kernel are running normally
@@ -97,17 +92,10 @@ async def connect_notebook(
         kernel.stop()
         return f"Notebook connection failed! Error: {e}"
     
-    # 连接成功,将kernel和notebook信息保存到kernel_manager中
-    # Connection successful, save the kernel and notebook information to kernel_manager
+    # 连接成功,将kernel和notebook信息保存到notebook_manager中
+    # Connection successful, save the kernel and notebook information to notebook_manager
     kernel.restart()
-    kernel_manager[notebook_name] = {
-        "kernel": kernel,
-        "notebook": {
-            "server_url": server_url,
-            "token": token,
-            "path": notebook_path
-        }
-    }
+    notebook_manager.add_notebook(notebook_name, kernel, server_url, token, notebook_path)
     return_info = f"{notebook_name} connection successful!\n{list_info}"
     return return_info
 
@@ -117,13 +105,13 @@ async def list_notebook() -> str:
     List all currently connected Notebooks.
     It will return unique name, Jupyter URL and Path of all connected Notebooks
     """
-    if not kernel_manager:
+    if notebook_manager.is_empty():
         return "No notebook is currently connected"
     
     headers = ["Name", "Jupyter URL", "Path"]
     
     rows = []
-    for notebook_name, notebook_info in kernel_manager.items():
+    for notebook_name, notebook_info in notebook_manager.get_all_notebooks().items():
         notebook_path = notebook_info["notebook"]["path"]
         server_url = notebook_info["notebook"]["server_url"]
         rows.append([notebook_name, server_url, notebook_path])
@@ -138,11 +126,13 @@ async def restart_notebook(
     """
     Restart the kernel of a specified Notebook, clear all imported packages and variables
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
     
-    kernel_manager[notebook_name]["kernel"].restart()
-    return f"{notebook_name} restart successful"
+    if notebook_manager.restart_notebook(notebook_name):
+        return f"{notebook_name} restart successful"
+    else:
+        return f"Failed to restart {notebook_name}"
 
 @mcp.tool(tags={"core","notebook","read_notebook"})
 async def read_notebook(
@@ -154,11 +144,10 @@ async def read_notebook(
     It will return the formatted content of the Notebook (including Index, Cell Type, Execution Count and Full Source Content).
     ONLY used when the user explicitly instructs to read the full content of the Notebook.
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return "Notebook does not exist, please connect it first"
 
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook:
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
         ydoc = notebook._doc
         total_cells = len(ydoc._ycells)
         
@@ -190,11 +179,10 @@ async def list_cell(
     It will return Index, Type, Execution Count and First Line of the Cell.
     It will be used to quickly overview the structure and current status of the Notebook or locate the index of specific cells for following operations(e.g. delete, insert).
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
     
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook: 
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook: 
         table = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
     return table
 
@@ -207,11 +195,10 @@ async def read_cell(
     Read the detailed content of a specific cell.
     It will return the source code, execution count and output of the cell.
     '''
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
     
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook:
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
         ydoc = notebook._doc
 
         if cell_index < 0 or cell_index >= len(ydoc._ycells):
@@ -240,11 +227,10 @@ async def delete_cell(
     Delete a specific cell.
     When deleting many cells, MUST delete them in descending order of their index.
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
     
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook:
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
         ydoc = notebook._doc
         
         if cell_index < 0 or cell_index >= len(ydoc._ycells):
@@ -267,9 +253,7 @@ async def delete_cell(
             surrounding_info = "Notebook is now empty, no cells remaining"
 
         if FORCE_SYNC:
-            sync_notebook(notebook, 
-                          kernel_manager[notebook_name]["notebook"]["path"],
-                          kernel_manager[notebook_name]["kernel"])
+            notebook_manager.sync_notebook(notebook, notebook_name)
 
     return f"Delete successful!\nDeleted cell content:\n{deleted_cell_content}\nSurrounding cells information:\n{surrounding_info}"
 
@@ -283,11 +267,10 @@ async def insert_cell(
     Insert a cell at the specified index.
     When inserting many cells, MUST insert them in ascending order of their index.
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
     
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook:
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
         total_cells = len(notebook._doc._ycells)
         
         if cell_index < 0 or cell_index > total_cells:
@@ -316,9 +299,7 @@ async def insert_cell(
         surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
 
         if FORCE_SYNC:
-            sync_notebook(notebook, 
-                          kernel_manager[notebook_name]["notebook"]["path"],
-                          kernel_manager[notebook_name]["kernel"])
+            notebook_manager.sync_notebook(notebook, notebook_name)
         
     return f"Insert successful!\nSurrounding cells information:\n{surrounding_info}"
 
@@ -331,11 +312,10 @@ async def execute_cell(
     Execute a specific cell with a timeout.
     It will return the output of the cell.
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
     
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook:
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
         ydoc = notebook._doc
         if cell_index < 0 or cell_index >= len(ydoc._ycells):
             return [f"Cell index {cell_index} out of range, Notebook has {len(ydoc._ycells)} cells"]
@@ -343,7 +323,7 @@ async def execute_cell(
         if ydoc.get_cell(cell_index)['cell_type'] != "code":
             return [f"Cell index {cell_index} is not code, no need to execute"]
         
-        kernel = kernel_manager[notebook_name]["kernel"]
+        kernel = notebook_manager.get_kernel(notebook_name)
         execution_task = asyncio.create_task(
             asyncio.to_thread(notebook.execute_cell, cell_index, kernel)
         )
@@ -368,20 +348,17 @@ async def overwrite_cell(
     Overwrite the content of a specific cell
     It will return a comparison (diff style, `+` for new lines, `-` for deleted lines) of the cell's content.
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return "Notebook does not exist, please check if the notebook name is correct"
     
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook:
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
         if cell_index < 0 or cell_index >= len(notebook._doc._ycells):
             return f"Cell index {cell_index} out of range, Notebook has {len(notebook._doc._ycells)} cells"
         
         raw_content = Cell(notebook._doc.get_cell(cell_index)).get_source()
         notebook.set_cell_source(cell_index, cell_content)
         if FORCE_SYNC:
-            sync_notebook(notebook, 
-                        kernel_manager[notebook_name]["notebook"]["path"],
-                        kernel_manager[notebook_name]["kernel"])
+            notebook_manager.sync_notebook(notebook, notebook_name)
         
         diff = difflib.unified_diff(raw_content.splitlines(keepends=False), cell_content.splitlines(keepends=False))
         diff = "\n".join(list(diff)[3:])
@@ -403,13 +380,12 @@ async def append_execute_code_cell(
     It is highly recommended for replacing the combination of `insert_cell` and `execute_cell` for a code cell at the end of the Notebook.
     It will return the output of the cell.
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
     
-    ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
-    async with NbModelClient(ws_url) as notebook:
+    async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
         cell_index = notebook.add_code_cell(cell_content)
-        kernel = kernel_manager[notebook_name]["kernel"]
+        kernel = notebook_manager.get_kernel(notebook_name)
         execution_task = asyncio.create_task(
             asyncio.to_thread(notebook.execute_cell, cell_index, kernel)
         )
@@ -425,9 +401,7 @@ async def append_execute_code_cell(
         cell = Cell(notebook._doc.get_cell(cell_index))
             
         if FORCE_SYNC:
-            sync_notebook(notebook, 
-                            kernel_manager[notebook_name]["notebook"]["path"],
-                            kernel_manager[notebook_name]["kernel"])
+            notebook_manager.sync_notebook(notebook, notebook_name)
         
         return [f"Cell index {cell_index} execution successful!"] + cell.get_outputs()
 
@@ -448,10 +422,10 @@ async def execute_temporary_code(
     1. Import new modules and perform variable assignments that affect subsequent Notebook execution
     2. Run code that requires a long time to run
     """
-    if notebook_name not in kernel_manager:
+    if notebook_name not in notebook_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
     
-    kernel = kernel_manager[notebook_name]["kernel"]
+    kernel = notebook_manager.get_kernel(notebook_name)
     cell = Cell(kernel.execute(cell_content))
     return cell.get_outputs()
     
