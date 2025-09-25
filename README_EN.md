@@ -73,8 +73,8 @@ Jupyter MCP Server was developed to address this issue. Through the MCP protocol
 
 | Name | Description | Notes |
 |:---:|:---:|:---:|
-| append_execute_cell | Add and execute a cell at the end of a Notebook | A combination of insert+execute for frequent operations, reducing tool calls. |
-| execute_temporary_cell | Execute a temporary code block (not saved to the Notebook) | Used for magic commands, code snippet debugging, viewing intermediate variables, etc. |
+| append_execute_code_cell | Add and execute a code cell at the end of a Notebook | A combination of insert+execute for frequent operations, reducing tool calls. |
+| execute_temporary_code | Execute a temporary code block (not saved to the Notebook) | Used for magic commands, code snippet debugging, viewing intermediate variables, etc. |
 
 For more details on the tools, please see the [Tools Documentation](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/tools_EN.md).
 

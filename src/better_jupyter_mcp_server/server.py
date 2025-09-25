@@ -281,7 +281,6 @@ async def insert_cell(
     cell_content: str) -> str:
     """
     Insert a cell at the specified index.
-    Using `append_execute_cell` as a alternative if you want to insert at the end of the notebook and then execute it.
     When inserting many cells, MUST insert them in ascending order of their index.
     """
     if notebook_name not in kernel_manager:
@@ -394,61 +393,55 @@ async def overwrite_cell(
 # Advanced Integrated Cell Function Module (2)
 #===========================================
 
-@mcp.tool(tags={"advanced","cell","append_execute_cell"})
-async def append_execute_cell(
+@mcp.tool(tags={"advanced","cell","append_execute_code_cell"})
+async def append_execute_code_cell(
     notebook_name: str,
-    cell_type: Literal["code", "markdown"],
     cell_content: str,
     timeout: Annotated[int, "seconds"] = 60) -> list[str | ImageContent]:
     """
-    Add a new cell to the end of a Notebook and immediately execute it.
+    Add a new code cell to the end of a Notebook and immediately execute it.
+    It is highly recommended for replacing the combination of `insert_cell` and `execute_cell` for a code cell at the end of the Notebook.
     It will return the output of the cell.
-    It is highly recommended for replacing the combination of `insert_cell` and `execute_cell` at the end of the Notebook.
     """
     if notebook_name not in kernel_manager:
         return ["Notebook does not exist, please check if the notebook name is correct"]
     
     ws_url = get_jupyter_notebook_websocket_url(**kernel_manager[notebook_name]["notebook"])
     async with NbModelClient(ws_url) as notebook:
+        cell_index = notebook.add_code_cell(cell_content)
+        kernel = kernel_manager[notebook_name]["kernel"]
+        execution_task = asyncio.create_task(
+            asyncio.to_thread(notebook.execute_cell, cell_index, kernel)
+        )
         
-        if cell_type == "code":
-            cell_index = notebook.add_code_cell(cell_content)
-            kernel = kernel_manager[notebook_name]["kernel"]
-            execution_task = asyncio.create_task(
-                asyncio.to_thread(notebook.execute_cell, cell_index, kernel)
-            )
+        try:
+            await asyncio.wait_for(execution_task, timeout=timeout)
+        except asyncio.TimeoutError:
+            execution_task.cancel()
+            if kernel and hasattr(kernel, 'interrupt'):
+                kernel.interrupt()
+            return [f"[TIMEOUT ERROR: Cell execution exceeded {timeout} seconds]"]
+        
+        cell = Cell(notebook._doc.get_cell(cell_index))
             
-            try:
-                await asyncio.wait_for(execution_task, timeout=timeout)
-            except asyncio.TimeoutError:
-                execution_task.cancel()
-                if kernel and hasattr(kernel, 'interrupt'):
-                    kernel.interrupt()
-                return [f"[TIMEOUT ERROR: Cell execution exceeded {timeout} seconds]"]
-            
-            cell = Cell(notebook._doc.get_cell(cell_index))
-            return [f"Cell index {cell_index} execution successful!"] + cell.get_outputs()
-        else:
-            cell_index = notebook.add_markdown_cell(cell_content)
-            
-            if FORCE_SYNC:
-                sync_notebook(notebook, 
-                              kernel_manager[notebook_name]["notebook"]["path"],
-                              kernel_manager[notebook_name]["kernel"])
-            
-            return [f"Cell index {cell_index} Markdown Cell addition successful!"]
+        if FORCE_SYNC:
+            sync_notebook(notebook, 
+                            kernel_manager[notebook_name]["notebook"]["path"],
+                            kernel_manager[notebook_name]["kernel"])
+        
+        return [f"Cell index {cell_index} execution successful!"] + cell.get_outputs()
 
-@mcp.tool(tags={"advanced","cell","execute_temporary_cell"})
-async def execute_temporary_cell(
+@mcp.tool(tags={"advanced","cell","execute_temporary_code"})
+async def execute_temporary_code(
     notebook_name: str,
     cell_content: str) -> list[str | ImageContent]:
     """
     Execute a temporary code block (not saved to the Notebook) and will return the output.
     
     It will recommend to use in following cases:
-    1. Execute Jupyter magic commands
+    1. Execute Jupyter magic commands(e.g., `%timeit`, `%pip install xxx`)
     2. Debug code
-    3. View intermediate variable values(e.g., `print(xxx)` or `df.head()`)
+    3. View intermediate variable values(e.g., `print(xxx)`, `df.head()`)
     4. Perform temporary statistical calculations(e.g., `np.mean(df['xxx'])`)
     
     DO NOT USE IN THE FOLLOWING CASES:

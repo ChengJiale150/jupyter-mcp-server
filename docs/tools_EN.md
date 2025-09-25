@@ -169,23 +169,22 @@ This document provides a detailed introduction to all the tools offered by the J
 
 ## Advanced Integrated Cell Function Module
 
-### `append_execute_cell`
+### `append_execute_code_cell`
 
-- **Function**: Adds a new cell to the end of a Notebook and immediately executes it.
+- **Function**: Adds a new code cell to the end of a Notebook and immediately executes it.
 - **Output**: Returns the output of the cell after execution, with support for multimodal output. If execution times out, a timeout error message is returned.
-- **Important Notes**: This is a high-frequency operation, equivalent to a combination of `insert_cell` (at the end) and `execute_cell`, designed to reduce the number of tool calls.
+- **Important Notes**: This is a high-frequency operation, equivalent to a combination of `insert_cell` (at the end) and `execute_cell` for a code cell, designed to reduce the number of tool calls.
 - **Parameters**:
 
 | Parameter | Type | Description | Default |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | The name of the Notebook. | |
-| `cell_type` | `Literal["code", "markdown"]` | The type of cell to add. | |
 | `cell_content` | `str` | The content of the cell to add. | |
 | `timeout` | `int` | The execution timeout in seconds. | `60` |
 
 ---
 
-### `execute_temporary_cell`
+### `execute_temporary_code`
 
 - **Function**: Executes a temporary block of code whose content is not saved to the Notebook.
 - **Output**: The output from the kernel after execution, with support for multimodal output.

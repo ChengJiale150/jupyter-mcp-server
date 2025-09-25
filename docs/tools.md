@@ -168,23 +168,22 @@
 
 ## Cell高级集成功能模块
 
-### `append_execute_cell`
+### `append_execute_code_cell`
 
-- **作用**: 在Notebook的末尾添加一个新的Cell并立即执行它。
+- **作用**: 在Notebook的末尾添加一个新的Code Cell并立即执行它。
 - **输出内容**: 返回执行后Cell的输出结果,支持多模态输出。如果执行超时,将返回超时错误信息。
-- **必要说明**: 这是一个高频操作,等同于`insert_cell`（在末尾）和`execute_cell`的组合,旨在减少工具调用次数。
+- **必要说明**: 这是一个高频操作,等同于`insert_cell`（在末尾）和`execute_cell` for a code cell的组合,旨在减少工具调用次数。
 - **参数说明**:
 
 | 参数名 | 类型 | 说明 | 默认值 |
 | :--- | :--- | :--- | :--- |
 | `notebook_name` | `str` | Notebook的名称 | |
-| `cell_type` | `Literal["code", "markdown"]` | 要添加的Cell的类型 | |
 | `cell_content` | `str` | 要添加的Cell的内容 | |
 | `timeout` | `int` | 执行的超时时间（秒） | `60` |
 
 ---
 
-### `execute_temporary_cell`
+### `execute_temporary_code`
 
 - **作用**: 执行临时的代码块，其内容不会被保存到Notebook中。
 - **输出内容**: 内核执行后的输出结果,支持多模态输出

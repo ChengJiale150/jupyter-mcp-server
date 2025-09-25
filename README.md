@@ -73,8 +73,8 @@ Jupyter MCP Server 就是为了解决这个问题而开发的。它通过MCP协�
 
 | 名称                     | 描述                     | 说明                                   |
 |:----------------------:|:----------------------:|:------------------------------------:|
-| append_execute_cell    | 在Notebook末尾添加并执行Cell   | insert+execute的组合为高频操作,将其组合减少工具的调用次数 |
-| execute_temporary_cell | 执行临时代码块(不存储到Notebook中) | 用于进行魔法指令执行、代码片段调试、查看中间变量取值等临时操作      |
+| append_execute_code_cell    | 在Notebook末尾添加并执行Code Cell   | insert+execute的组合为高频操作,将其组合减少工具的调用次数 |
+| execute_temporary_code | 执行临时代码块(不存储到Notebook中) | 用于进行魔法指令执行、代码片段调试、查看中间变量取值等临时操作      |
 
 工具的具体内容详见[工具文档](https://github.com/ChengJiale150/jupyter-mcp-server/blob/main/docs/tools.md)
 
