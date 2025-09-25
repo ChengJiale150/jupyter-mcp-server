@@ -111,7 +111,7 @@ async def list_notebook() -> str:
     headers = ["Name", "Jupyter URL", "Path"]
     
     rows = []
-    for notebook_name, notebook_info in notebook_manager.get_all_notebooks().items():
+    for notebook_name, notebook_info in notebook_manager:
         notebook_path = notebook_info["notebook"]["path"]
         server_url = notebook_info["notebook"]["server_url"]
         rows.append([notebook_name, server_url, notebook_path])

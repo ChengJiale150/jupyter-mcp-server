@@ -57,6 +57,16 @@ class NotebookManager:
         """
         return name in self._notebooks
     
+    def __iter__(self):
+        """
+        支持迭代器语法，返回(notebook_name, notebook_info)元组
+        Support iterator syntax, returns (notebook_name, notebook_info) tuples
+        
+        Returns:
+            迭代器 / Iterator
+        """
+        return iter(self._notebooks.items())
+    
     def add_notebook(self, name: str, kernel: KernelClient, server_url: str, token: str, path: str) -> None:
         """
         添加一个新的notebook
@@ -143,16 +153,6 @@ class NotebookManager:
         if name in self._notebooks:
             return self._notebooks[name]["notebook"]["path"]
         return None
-    
-    def get_all_notebooks(self) -> Dict[str, Dict[str, Any]]:
-        """
-        获取所有notebook信息
-        Get all notebooks info
-        
-        Returns:
-            所有notebook信息 / All notebooks info
-        """
-        return self._notebooks
     
     def restart_notebook(self, name: str) -> bool:
         """
