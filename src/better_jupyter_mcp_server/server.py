@@ -1,7 +1,12 @@
-import asyncio, difflib
+import asyncio, difflib, os
 from fastmcp import FastMCP
 from typing import Annotated, Literal
 from mcp.types import ImageContent
+
+# 设置环境变量以避免Jupyter平台目录警告
+# Set environment variable to avoid Jupyter platform directory warnings
+os.environ.setdefault("JUPYTER_PLATFORM_DIRS", "1")
+
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
 from .utils import list_cell_basic, Cell, format_table, format_notebook, NotebookManager
