@@ -80,7 +80,6 @@ def _get_env_int(env_name: str, default_value: int) -> int:
 # Environment variables take priority, use config file values if no environment variables
 ALLOW_IMG: bool = _get_env_bool("ALLOW_IMG", _config["basic"]["ALLOW_IMG"])
 ALLOW_IMG_PREPROCESS: bool = _get_env_bool("ALLOW_IMG_PREPROCESS", _config["basic"]["ALLOW_IMG_PREPROCESS"])
-FORCE_SYNC: bool = _get_env_bool("FORCE_SYNC", _config["basic"]["FORCE_SYNC"])
 
 # 图片配置 / Image Configuration
 MAX_WIDTH: int = _get_env_int("MAX_WIDTH", _config["img"]["MAX_WIDTH"])

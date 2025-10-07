@@ -13,7 +13,6 @@ from jupyter_kernel_client import KernelClient
 from jupyter_server_api import JupyterServerClient,NotFoundError
 from .utils import list_cell_basic, Cell, format_table, format_notebook, NotebookManager
 from . import __version__
-from .__env__ import FORCE_SYNC
 
 mcp = FastMCP(name="Jupyter-MCP-Server", version=__version__)
 
@@ -124,7 +123,7 @@ async def connect_notebook(
         return f"Notebook connection failed! Error: {e}"
     
     # Connection successful, save the kernel and notebook information to notebook_manager
-    notebook_manager.add_notebook(notebook_name, kernel, server_url, token, notebook_path)
+    notebook_manager.add_notebook(notebook_name, kernel, server_client, server_url, token, notebook_path)
     return_info = f"{notebook_name} connection successful!\n{list_info}"
     return return_info
 
@@ -191,6 +190,7 @@ async def read_notebook(
             for i in range(start_index, end_index)
         ]
         formatted_content = format_notebook(cells, start_index, total_cells)
+    
     return formatted_content
 
 #===========================================
@@ -213,6 +213,7 @@ async def list_cell(
     
     async with notebook_manager.get_notebook_connection(notebook_name) as notebook: 
         table = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
+    
     return table
 
 @mcp.tool(tags={"core","cell","read_cell"})
@@ -281,9 +282,6 @@ async def delete_cell(
         else:
             surrounding_info = "Notebook is now empty, no cells remaining"
 
-        if FORCE_SYNC:
-            notebook_manager.sync_notebook(notebook, notebook_name)
-
     return f"Delete successful!\nDeleted cell content:\n{deleted_cell_content}\nSurrounding cells information:\n{surrounding_info}"
 
 @mcp.tool(tags={"core","cell","insert_cell"})
@@ -327,9 +325,6 @@ async def insert_cell(
         
         surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
 
-        if FORCE_SYNC:
-            notebook_manager.sync_notebook(notebook, notebook_name)
-        
     return f"Insert successful!\nSurrounding cells information:\n{surrounding_info}"
 
 @mcp.tool(tags={"core","cell","execute_cell"})
@@ -386,8 +381,6 @@ async def overwrite_cell(
         
         raw_content = Cell(notebook._doc.get_cell(cell_index)).get_source()
         notebook.set_cell_source(cell_index, cell_content)
-        if FORCE_SYNC:
-            notebook_manager.sync_notebook(notebook, notebook_name)
         
         diff = difflib.unified_diff(raw_content.splitlines(keepends=False), cell_content.splitlines(keepends=False))
         diff = "\n".join(list(diff)[3:])
@@ -428,9 +421,6 @@ async def append_execute_code_cell(
             return [f"[TIMEOUT ERROR: Cell execution exceeded {timeout} seconds]"]
         
         cell = Cell(notebook._doc.get_cell(cell_index))
-            
-        if FORCE_SYNC:
-            notebook_manager.sync_notebook(notebook, notebook_name)
         
         return [f"Cell index {cell_index} execution successful!"] + cell.get_outputs()
 
