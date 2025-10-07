@@ -93,7 +93,19 @@ async def connect_notebook(
     
     # Create notebook
     if mode == "create":
-        server_client.contents.create_notebook(notebook_path)
+        content = {
+            "cells": [{
+                "cell_type": "markdown",
+                "metadata": {},
+                "source": [
+                    "Overwrite this cell with Notebook Metadata",
+                ]
+            }],
+            "metadata": {},
+            "nbformat": 4,
+            "nbformat_minor": 4
+        }
+        server_client.contents.create_notebook(notebook_path, content)
     
     # Create kernel client
     kernel = KernelClient(
