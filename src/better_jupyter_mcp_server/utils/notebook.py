@@ -5,6 +5,8 @@ from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket
 from jupyter_kernel_client import KernelClient
 from jupyter_server_api import JupyterServerClient
 
+from ..__env__ import AUTO_SAVE_NOTEBOOK
+
 class NotebookManager:
     """
     Class for managing multiple Notebooks and their corresponding Kernels
@@ -171,5 +173,6 @@ class NotebookConnection:
     ) -> None:
         """Exit context manager"""
         if self._notebook:
-            self.server_client.contents.save_notebook(self.notebook_info["path"], self._notebook.as_dict())
+            if AUTO_SAVE_NOTEBOOK:
+                self.server_client.contents.save_notebook(self.notebook_info["path"], self._notebook.as_dict())
             await self._notebook.__aexit__(exc_type, exc_val, exc_tb)
