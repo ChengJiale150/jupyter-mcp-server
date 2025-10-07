@@ -1,5 +1,6 @@
 import asyncio, difflib, os
 from fastmcp import FastMCP
+from pathlib import Path
 from typing import Annotated, Literal
 from mcp.types import ImageContent
 
@@ -9,6 +10,7 @@ os.environ.setdefault("JUPYTER_PLATFORM_DIRS", "1")
 
 from jupyter_nbmodel_client import NbModelClient, get_jupyter_notebook_websocket_url
 from jupyter_kernel_client import KernelClient
+from jupyter_server_api import JupyterServerClient,NotFoundError
 from .utils import list_cell_basic, Cell, format_table, format_notebook, NotebookManager
 from . import __version__
 from .__env__ import FORCE_SYNC
@@ -50,14 +52,11 @@ async def connect_notebook(
         else:
             return f"{notebook_name} is already connected to {notebook_manager.get_notebook_path(notebook_name)}, please rename it"
     
-    # 检查Jupyter与Kernel是否正常运行
-    # Check if Jupyter and Kernel are running normally
+    # Check if Jupyter are running normally
+    server_client = JupyterServerClient(base_url=server_url, token=token)
     try:
-        kernel = KernelClient(server_url=server_url, token=token)
-        kernel.start()
-        kernel.execute("print('Hello, World!')")
+        server_client.get_status()
     except Exception as e:
-        kernel.stop()
         return f"""Jupyter environment connection failed! 
         Error as below: 
         ```
@@ -67,27 +66,42 @@ async def connect_notebook(
         Please check: 
         1. Jupyter environment is successfully started 
         2. URL address is correct and can be accessed normally
-        3. Token is correct"""
-
-    exist_result = Cell(kernel.execute(f'from pathlib import Path\nPath("{notebook_path}").exists()')).get_output_info(0)
-    if mode == "connect":
-        if (exist_result["output_type"] == "execute_result") and ("True" not in exist_result["output"]):
-            kernel.stop()
-            return f"Notebook path does not exist, please check if the path is correct"
-        elif exist_result["output_type"] == "error":
-            kernel.stop()
-            return f"Error: {exist_result['output']}"
-    elif mode == "create":
-        if (exist_result["output_type"] == "execute_result") and ("True" in exist_result["output"]):
-            kernel.stop()
-            return f"Notebook path already exists, please use connect mode to connect"
-        create_code = f'import nbformat as nbf\nfrom pathlib import Path\nnotebook_path = Path("{notebook_path}")\nnb = nbf.v4.new_notebook()\nnb.cells.append(nbf.v4.new_markdown_cell("overwrite this cell for real notebook metadata"))\nwith open(notebook_path, "w", encoding="utf-8") as f:\n    nbf.write(nb, f)\nprint("OK")'
-        create_result = Cell(kernel.execute(create_code)).get_output_info(0)
-        if create_result["output_type"] == "error":
-            kernel.stop()
-            return f"Error: {create_result['output']}"
+        3. Token is correct
+        """
     
-    # 尝试连接notebook
+    # Check if notebook path exists
+    path = Path(notebook_path)
+    try:
+        # For relative paths starting with just filename, assume current directory
+        parent_path = str(path.parent) if str(path.parent) != "." else ""
+        
+        if parent_path:
+            dir_contents = server_client.contents.list_directory(parent_path)
+        else:
+            # Check in the root directory of Jupyter server
+            dir_contents = server_client.contents.list_directory("")
+            
+        if mode == "connect":
+            file_exists = any(file.name == path.name for file in dir_contents)
+            if not file_exists:
+                return f"'{notebook_path}' not found in jupyter server, please check the notebook already exists."
+    except NotFoundError:
+        parent_dir = str(path.parent) if str(path.parent) != "." else "root directory"
+        return f"'{parent_dir}' not found in jupyter server, please check the directory path already exists."
+    except Exception as e:
+        return f"Failed to check the path '{notebook_path}': {e}"
+    
+    # Create notebook
+    if mode == "create":
+        server_client.contents.create_notebook(notebook_path)
+    
+    # Create kernel client
+    kernel = KernelClient(
+        server_url=server_url,
+        token=token,
+    )
+    kernel.start()
+
     # Try to connect to the notebook
     try:
         ws_url = get_jupyter_notebook_websocket_url(server_url=server_url, token=token, path=notebook_path)
@@ -97,9 +111,7 @@ async def connect_notebook(
         kernel.stop()
         return f"Notebook connection failed! Error: {e}"
     
-    # 连接成功,将kernel和notebook信息保存到notebook_manager中
     # Connection successful, save the kernel and notebook information to notebook_manager
-    kernel.restart()
     notebook_manager.add_notebook(notebook_name, kernel, server_url, token, notebook_path)
     return_info = f"{notebook_name} connection successful!\n{list_info}"
     return return_info

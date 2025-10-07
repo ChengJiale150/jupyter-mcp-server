@@ -164,6 +164,7 @@ dependencies = [
     { name = "jupyter-collaboration" },
     { name = "jupyter-kernel-client" },
     { name = "jupyter-nbmodel-client" },
+    { name = "jupyter-server-api" },
     { name = "nbformat" },
     { name = "pillow" },
 ]
@@ -175,6 +176,7 @@ requires-dist = [
     { name = "jupyter-collaboration", specifier = ">=4.1.1" },
     { name = "jupyter-kernel-client", specifier = ">=0.8.0" },
     { name = "jupyter-nbmodel-client", specifier = ">=0.14.0" },
+    { name = "jupyter-server-api", specifier = ">=0.1.0" },
     { name = "nbformat", specifier = ">=5.10.4" },
     { name = "pillow", specifier = ">=10.0.0" },
 ]
@@ -944,6 +946,18 @@ dependencies = [
 sdist = { url = "https://pypi.tuna.tsinghua.edu.cn/packages/5b/ac/e040ec363d7b6b1f11304cc9f209dac4517ece5d5e01821366b924a64a50/jupyter_server-2.17.0.tar.gz", hash = "sha256:c38ea898566964c888b4772ae1ed58eca84592e88251d2cfc4d171f81f7e99d5", size = 731949, upload-time = "2025-08-21T14:42:54.042Z" }
 wheels = [
     { url = "https://pypi.tuna.tsinghua.edu.cn/packages/92/80/a24767e6ca280f5a49525d987bf3e4d7552bf67c8be07e8ccf20271f8568/jupyter_server-2.17.0-py3-none-any.whl", hash = "sha256:e8cb9c7db4251f51ed307e329b81b72ccf2056ff82d50524debde1ee1870e13f", size = 388221, upload-time = "2025-08-21T14:42:52.034Z" },
+]
+
+[[package]]
+name = "jupyter-server-api"
+version = "0.1.0"
+source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "requests" },
+]
+wheels = [
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/e3/79/5455e25e763511b35f0c28212e223d6c5402518bcd7d3609fa5f251673a0/jupyter_server_api-0.1.0-py3-none-any.whl", hash = "sha256:c8659deeadf03675e0e0339e8000984ec2567fc99e48667c25bd6d7fc497c0f3", size = 19397, upload-time = "2025-09-29T12:19:46.3Z" },
 ]
 
 [[package]]
