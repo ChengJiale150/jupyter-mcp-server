@@ -267,7 +267,9 @@ async def delete_cell(
         if total_cells > 0:
             limit = min(10, total_cells)
             # Adjust start_index if we're near the end
-            start_index = max(0, cell_index - 5) if start_index + limit <= total_cells else max(0, total_cells - limit)
+            start_index = max(0, cell_index - 5) 
+            if start_index + limit <= total_cells:
+                start_index = max(0, total_cells - limit)
             surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
         else:
             surrounding_info = "Notebook is now empty, no cells remaining"
@@ -307,7 +309,9 @@ async def insert_cell(
         total_cells = len(notebook)
         limit = min(10, total_cells)
         # Adjust start_index if we're near the end
-        start_index = max(0, cell_index - 5) if start_index + limit <= total_cells else max(0, total_cells - limit)
+        start_index = max(0, cell_index - 5)
+        if start_index + limit <= total_cells:
+            start_index = max(0, total_cells - limit)
         surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
 
     return f"Insert successful!\nSurrounding cells information:\n{surrounding_info}"
