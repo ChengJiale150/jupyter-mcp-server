@@ -85,4 +85,4 @@ AUTO_SAVE_NOTEBOOK: bool = _get_env_bool("AUTO_SAVE_NOTEBOOK", _config["basic"][
 # 图片配置 / Image Configuration
 MAX_WIDTH: int = _get_env_int("MAX_WIDTH", _config["img"]["MAX_WIDTH"])
 MAX_HEIGHT: int = _get_env_int("MAX_HEIGHT", _config["img"]["MAX_HEIGHT"])
-IMAGE_TOEKN_SIZE: int = _get_env_int("IMAGE_TOEKN_SIZE", _config["img"]["IMAGE_TOEKN_SIZE"])
+IMAGE_TOKEN_SIZE: int = _get_env_int("IMAGE_TOKEN_SIZE", _config["img"]["IMAGE_TOKEN_SIZE"])

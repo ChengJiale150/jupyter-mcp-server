@@ -22,5 +22,5 @@ MAX_WIDTH = 700
 MAX_HEIGHT = 700
 # 每TOKEN图片尺寸分块的单位大小(PIXIV)
 # Per-TOKEN image dimension block size (PIXIV)
-IMAGE_TOEKN_SIZE = 28
+IMAGE_TOKEN_SIZE = 28
 
