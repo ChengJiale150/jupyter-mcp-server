@@ -347,9 +347,12 @@ async def execute_cell(
             if kernel and hasattr(kernel, 'interrupt'):
                 kernel.interrupt()
             return [f"[TIMEOUT ERROR: Cell execution exceeded {timeout} seconds]"]
+        
+        # Get cell outputs within the context manager while notebook is still connected
+        cell = Cell(notebook[cell_index])
+        outputs = cell.get_outputs()
     
-    cell = Cell(notebook[cell_index])
-    return cell.get_outputs()
+    return outputs
 
 @mcp.tool(tags={"core","cell","overwrite_cell"})
 async def overwrite_cell(
