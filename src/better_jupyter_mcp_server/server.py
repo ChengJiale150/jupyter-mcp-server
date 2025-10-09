@@ -256,12 +256,7 @@ async def delete_cell(
         if cell_index < 0 or cell_index >= len(notebook):
             return f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"
         
-        deleted_cell_content = Cell(notebook[cell_index]).source
-        
-        # TODO: Add delete_cell method to NotebookModel
-        ydoc = notebook._doc
-        del ydoc._ycells[cell_index]
-        
+        deleted_cell_content = Cell(notebook.delete_cell(cell_index)).source
         # Get surrounding cells info (5 above and 5 below the deleted position)
         total_cells = len(notebook)
         if total_cells > 0:
@@ -293,18 +288,7 @@ async def insert_cell(
         if cell_index < 0 or cell_index > len(notebook):
             return f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"
         
-        # TODO: Add insert_cell method to NotebookModel
-        if cell_type == "code":
-            if cell_index == len(notebook):
-                notebook.add_code_cell(cell_content)
-            else:
-                notebook.insert_code_cell(cell_index, cell_content)
-        elif cell_type == "markdown":
-            if cell_index == len(notebook):
-                notebook.add_markdown_cell(cell_content)
-            else:
-                notebook.insert_markdown_cell(cell_index, cell_content)
-
+        notebook.insert_cell(cell_index, cell_content, cell_type)
         # Get surrounding cells info (5 above and 5 below the inserted position)
         total_cells = len(notebook)
         limit = min(10, total_cells)
@@ -332,7 +316,7 @@ async def execute_cell(
         if cell_index < 0 or cell_index >= len(notebook):
             return [f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"]
         
-        if notebook[cell_index]['cell_type'] != "code":
+        if Cell(notebook[cell_index]).type != "code":
             return [f"Cell index {cell_index} is not code, need to execute a code cell"]
         
         kernel = notebook_manager.get_kernel(notebook_name)

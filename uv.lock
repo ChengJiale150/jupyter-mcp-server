@@ -175,7 +175,7 @@ requires-dist = [
     { name = "fastmcp", specifier = ">=2.12.2" },
     { name = "jupyter-collaboration", specifier = ">=4.1.1" },
     { name = "jupyter-kernel-client", specifier = ">=0.8.0" },
-    { name = "jupyter-nbmodel-client", specifier = ">=0.14.1" },
+    { name = "jupyter-nbmodel-client", specifier = ">=0.14.2" },
     { name = "jupyter-server-api", specifier = ">=0.1.0" },
     { name = "nbformat", specifier = ">=5.10.4" },
     { name = "pillow", specifier = ">=10.0.0" },
@@ -906,7 +906,7 @@ wheels = [
 
 [[package]]
 name = "jupyter-nbmodel-client"
-version = "0.14.1"
+version = "0.14.2"
 source = { registry = "https://pypi.tuna.tsinghua.edu.cn/simple" }
 dependencies = [
     { name = "datalayer-pycrdt" },
@@ -916,7 +916,7 @@ dependencies = [
     { name = "websockets" },
 ]
 wheels = [
-    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/b1/99/3bd3754ece51f8aa7223d64b11458dc678480d01bc9f6e25e7c8d16905a3/jupyter_nbmodel_client-0.14.1-py3-none-any.whl", hash = "sha256:b1b74dce616d56b77c453cdbf731f478808aac6afabaf4bec2377a2d006230a0", size = 27628, upload-time = "2025-10-08T16:00:17.198Z" },
+    { url = "https://pypi.tuna.tsinghua.edu.cn/packages/61/ff/2e8091612fab8826d02dc64617e57530024e3b5e8c44f59db166dd0962bc/jupyter_nbmodel_client-0.14.2-py3-none-any.whl", hash = "sha256:6c5ccbf5bdeaeb238e0b6ed5a9c15d34f3e201b9b2a4becb7baa9c47f85cd0f8", size = 29439, upload-time = "2025-10-09T09:02:01.76Z" },
 ]
 
 [[package]]
