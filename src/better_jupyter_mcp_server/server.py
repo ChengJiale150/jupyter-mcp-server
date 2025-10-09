@@ -268,7 +268,7 @@ async def delete_cell(
             limit = min(10, total_cells)
             # Adjust start_index if we're near the end
             start_index = max(0, cell_index - 5) 
-            if start_index + limit <= total_cells:
+            if start_index + limit > total_cells:
                 start_index = max(0, total_cells - limit)
             surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
         else:
@@ -310,7 +310,7 @@ async def insert_cell(
         limit = min(10, total_cells)
         # Adjust start_index if we're near the end
         start_index = max(0, cell_index - 5)
-        if start_index + limit <= total_cells:
+        if start_index + limit > total_cells:
             start_index = max(0, total_cells - limit)
         surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
 
