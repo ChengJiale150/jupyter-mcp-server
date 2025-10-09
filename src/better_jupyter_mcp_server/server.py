@@ -227,17 +227,17 @@ async def read_cell(
             return [f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"]
         
         cell = Cell(notebook[cell_index])
-        if cell.get_type() == "markdown":
-            result = [cell.get_source()]
-        elif cell.get_type() == "code":
+        if cell.type == "markdown":
+            result = [cell.source]
+        elif cell.type == "code":
             result = [
-                cell.get_source(),
-                f"Current execution count: {cell.get_execution_count()}"
+                cell.source,
+                f"Current execution count: {cell.execution_count}"
             ]
             if return_output:
                 result.extend(cell.get_outputs())
         else:
-            result = cell.get_source()
+            result = cell.source
             
     return result
 
@@ -256,7 +256,7 @@ async def delete_cell(
         if cell_index < 0 or cell_index >= len(notebook):
             return f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"
         
-        deleted_cell_content = Cell(notebook[cell_index]).get_source()
+        deleted_cell_content = Cell(notebook[cell_index]).source
         
         # TODO: Add delete_cell method to NotebookModel
         ydoc = notebook._doc
@@ -363,7 +363,7 @@ async def overwrite_cell(
         if cell_index < 0 or cell_index >= len(notebook):
             return f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"
         
-        raw_content = Cell(notebook[cell_index]).get_source()
+        raw_content = Cell(notebook[cell_index]).source
         notebook.set_cell_source(cell_index, cell_content)
         
         diff = difflib.unified_diff(raw_content.splitlines(keepends=False), cell_content.splitlines(keepends=False))

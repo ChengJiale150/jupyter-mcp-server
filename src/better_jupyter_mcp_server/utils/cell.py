@@ -6,8 +6,8 @@ from PIL import Image as PILImage
 from ..__env__ import ALLOW_IMG, ALLOW_IMG_PREPROCESS, MAX_WIDTH, MAX_HEIGHT, IMAGE_TOEKN_SIZE
 
 class Cell:
-    def __init__(self, cell: dict):
-        self.cell = cell
+    def __init__(self, cell: dict | Any):
+        self._cell = cell
     
     def _strip_ansi_codes(self, text: str | list[str]) -> str:
         """
@@ -90,28 +90,22 @@ class Cell:
         else:
             return f"[Unknown output type: {output['output_type']}]"
     
-    def get_type(self) -> str:
-        return self.cell['cell_type']
+    @property
+    def type(self) -> str:
+        return self._cell['cell_type']
     
-    def get_source(self) -> str:
-        if isinstance(self.cell['source'], list):
-            return "".join(self.cell['source'])
+    @property
+    def source(self) -> str:
+        if isinstance(self._cell['source'], list):
+            return "".join(self._cell['source'])
         else:
-            return self.cell['source']
+            return self._cell['source']
 
-    def get_execution_count(self) -> int | str:
-        return self.cell.get('execution_count', 'N/A')
-    
-    def get_output_info(self, index: int) -> dict:
-        outputs = self.cell.get('outputs', [])
-        assert index < len(outputs), "Cell index out of range"
-
-        return {
-            "output_type": outputs[index]['output_type'],
-            "output": self._process_output(outputs[index])
-        }
+    @property
+    def execution_count(self) -> int | str:
+        return self._cell.get('execution_count', 'N/A')
     
     def get_outputs(self) -> list:
-        outputs = self.cell.get('outputs', [])
+        outputs = self._cell.get('outputs', [])
         result = [self._process_output(output) for output in outputs]
         return result
