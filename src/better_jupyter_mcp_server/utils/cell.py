@@ -3,11 +3,11 @@ from typing import Any
 from fastmcp.utilities.types import Image
 from PIL import Image as PILImage
 
-from ..__env__ import ALLOW_IMG, ALLOW_IMG_PREPROCESS, MAX_WIDTH, MAX_HEIGHT, IMAGE_TOEKN_SIZE
+from ..__env__ import ALLOW_IMG, ALLOW_IMG_PREPROCESS, MAX_WIDTH, MAX_HEIGHT, IMAGE_TOKEN_SIZE
 
 class Cell:
-    def __init__(self, cell: dict):
-        self.cell = cell
+    def __init__(self, cell: dict | Any):
+        self._cell = cell
     
     def _strip_ansi_codes(self, text: str | list[str]) -> str:
         """
@@ -21,8 +21,8 @@ class Cell:
     
     def _preprocess_image(self, image_data: bytes) -> bytes:
         """
-        对图片进行预处理，包括等比例缩放和基于IMAGE_TOEKN_SIZE的进一步缩放
-        Process the image, including proportional scaling and further scaling based on IMAGE_TOEKN_SIZE
+        对图片进行预处理，包括等比例缩放和基于IMAGE_TOKEN_SIZE的进一步缩放
+        Process the image, including proportional scaling and further scaling based on IMAGE_TOKEN_SIZE
         
         Args:
             image_data: 原始图片的字节数据
@@ -46,11 +46,11 @@ class Cell:
             new_width = int(original_width * scale_ratio)
             new_height = int(original_height * scale_ratio)
             
-            final_width = (new_width // IMAGE_TOEKN_SIZE) * IMAGE_TOEKN_SIZE
-            final_height = (new_height // IMAGE_TOEKN_SIZE) * IMAGE_TOEKN_SIZE
+            final_width = (new_width // IMAGE_TOKEN_SIZE) * IMAGE_TOKEN_SIZE
+            final_height = (new_height // IMAGE_TOKEN_SIZE) * IMAGE_TOKEN_SIZE
 
-            final_width = max(final_width, IMAGE_TOEKN_SIZE)
-            final_height = max(final_height, IMAGE_TOEKN_SIZE)
+            final_width = max(final_width, IMAGE_TOKEN_SIZE)
+            final_height = max(final_height, IMAGE_TOKEN_SIZE)
             
             if final_width == original_width and final_height == original_height:
                 return image_data
@@ -90,28 +90,22 @@ class Cell:
         else:
             return f"[Unknown output type: {output['output_type']}]"
     
-    def get_type(self) -> str:
-        return self.cell['cell_type']
+    @property
+    def type(self) -> str:
+        return self._cell['cell_type']
     
-    def get_source(self) -> str:
-        if isinstance(self.cell['source'], list):
-            return "".join(self.cell['source'])
+    @property
+    def source(self) -> str:
+        if isinstance(self._cell['source'], list):
+            return "".join(self._cell['source'])
         else:
-            return self.cell['source']
+            return self._cell['source']
 
-    def get_execution_count(self) -> int | str:
-        return self.cell.get('execution_count', 'N/A')
-    
-    def get_output_info(self, index: int) -> dict:
-        outputs = self.cell.get('outputs', [])
-        assert index < len(outputs), "Cell index out of range"
-
-        return {
-            "output_type": outputs[index]['output_type'],
-            "output": self._process_output(outputs[index])
-        }
+    @property
+    def execution_count(self) -> int | str:
+        return self._cell.get('execution_count', 'N/A')
     
     def get_outputs(self) -> list:
-        outputs = self.cell.get('outputs', [])
+        outputs = self._cell.get('outputs', [])
         result = [self._process_output(output) for output in outputs]
         return result

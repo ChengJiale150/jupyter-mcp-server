@@ -176,19 +176,13 @@ async def read_notebook(
         return "Notebook does not exist, please connect it first"
 
     async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
-        ydoc = notebook._doc
-        total_cells = len(ydoc._ycells)
-        
-        # Validate start_index
+        total_cells = len(notebook)
         if start_index < 0 or start_index >= total_cells:
             return f"Start index {start_index} out of range, Notebook has {total_cells} cells"
         
         end_index = min(start_index + limit, total_cells) if limit > 0 else total_cells
         
-        cells = [
-            Cell(ydoc.get_cell(i))
-            for i in range(start_index, end_index)
-        ]
+        cells = [Cell(notebook[i]) for i in range(start_index, end_index)]
         formatted_content = format_notebook(cells, start_index, total_cells)
     
     return formatted_content
@@ -229,23 +223,21 @@ async def read_cell(
         return ["Notebook does not exist, please check if the notebook name is correct"]
     
     async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
-        ydoc = notebook._doc
-
-        if cell_index < 0 or cell_index >= len(ydoc._ycells):
-            return [f"Cell index {cell_index} out of range, Notebook has {len(ydoc._ycells)} cells"]
+        if cell_index < 0 or cell_index >= len(notebook):
+            return [f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"]
         
-        cell = Cell(ydoc.get_cell(cell_index))
-        if cell.get_type() == "markdown":
-            result = [cell.get_source()]
-        elif cell.get_type() == "code":
+        cell = Cell(notebook[cell_index])
+        if cell.type == "markdown":
+            result = [cell.source]
+        elif cell.type == "code":
             result = [
-                cell.get_source(),
-                f"Current execution count: {cell.get_execution_count()}"
+                cell.source,
+                f"Current execution count: {cell.execution_count}"
             ]
             if return_output:
                 result.extend(cell.get_outputs())
         else:
-            result = cell.get_source()
+            result = cell.source
             
     return result
 
@@ -261,21 +253,16 @@ async def delete_cell(
         return "Notebook does not exist, please check if the notebook name is correct"
     
     async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
-        ydoc = notebook._doc
+        if cell_index < 0 or cell_index >= len(notebook):
+            return f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"
         
-        if cell_index < 0 or cell_index >= len(ydoc._ycells):
-            return f"Cell index {cell_index} out of range, Notebook has {len(ydoc._ycells)} cells"
-        
-        deleted_cell_content = Cell(ydoc.get_cell(cell_index)).get_source()
-        del ydoc._ycells[cell_index]
-        
+        deleted_cell_content = Cell(notebook.delete_cell(cell_index)).source
         # Get surrounding cells info (5 above and 5 below the deleted position)
-        total_cells = len(ydoc._ycells)
-        start_index = max(0, cell_index - 5)
-        limit = 10 if total_cells > 0 else 0
-        
+        total_cells = len(notebook)
         if total_cells > 0:
+            limit = min(10, total_cells)
             # Adjust start_index if we're near the end
+            start_index = max(0, cell_index - 5) 
             if start_index + limit > total_cells:
                 start_index = max(0, total_cells - limit)
             surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
@@ -298,31 +285,17 @@ async def insert_cell(
         return "Notebook does not exist, please check if the notebook name is correct"
     
     async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
-        total_cells = len(notebook._doc._ycells)
+        if cell_index < 0 or cell_index > len(notebook):
+            return f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"
         
-        if cell_index < 0 or cell_index > total_cells:
-            return f"Cell index {cell_index} out of range, Notebook has {total_cells} cells"
-        
-        if cell_type == "code":
-            if cell_index == total_cells:
-                notebook.add_code_cell(cell_content)
-            else:
-                notebook.insert_code_cell(cell_index, cell_content)
-        elif cell_type == "markdown":
-            if cell_index == total_cells:
-                notebook.add_markdown_cell(cell_content)
-            else:
-                notebook.insert_markdown_cell(cell_index, cell_content)
-
+        notebook.insert_cell(cell_index, cell_content, cell_type)
         # Get surrounding cells info (5 above and 5 below the inserted position)
-        new_total_cells = len(notebook._doc._ycells)
-        start_index = max(0, cell_index - 5)
-        limit = min(10, new_total_cells)
-        
+        total_cells = len(notebook)
+        limit = min(10, total_cells)
         # Adjust start_index if we're near the end
-        if start_index + limit > new_total_cells:
-            start_index = max(0, new_total_cells - limit)
-        
+        start_index = max(0, cell_index - 5)
+        if start_index + limit > total_cells:
+            start_index = max(0, total_cells - limit)
         surrounding_info = list_cell_basic(notebook, with_count=True, start_index=start_index, limit=limit)
 
     return f"Insert successful!\nSurrounding cells information:\n{surrounding_info}"
@@ -340,12 +313,11 @@ async def execute_cell(
         return ["Notebook does not exist, please check if the notebook name is correct"]
     
     async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
-        ydoc = notebook._doc
-        if cell_index < 0 or cell_index >= len(ydoc._ycells):
-            return [f"Cell index {cell_index} out of range, Notebook has {len(ydoc._ycells)} cells"]
+        if cell_index < 0 or cell_index >= len(notebook):
+            return [f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"]
         
-        if ydoc.get_cell(cell_index)['cell_type'] != "code":
-            return [f"Cell index {cell_index} is not code, no need to execute"]
+        if Cell(notebook[cell_index]).type != "code":
+            return [f"Cell index {cell_index} is not code, need to execute a code cell"]
         
         kernel = notebook_manager.get_kernel(notebook_name)
         execution_task = asyncio.create_task(
@@ -359,9 +331,12 @@ async def execute_cell(
             if kernel and hasattr(kernel, 'interrupt'):
                 kernel.interrupt()
             return [f"[TIMEOUT ERROR: Cell execution exceeded {timeout} seconds]"]
+        
+        # Get cell outputs within the context manager while notebook is still connected
+        cell = Cell(notebook[cell_index])
+        outputs = cell.get_outputs()
     
-    cell = Cell(ydoc.get_cell(cell_index))
-    return cell.get_outputs()
+    return outputs
 
 @mcp.tool(tags={"core","cell","overwrite_cell"})
 async def overwrite_cell(
@@ -376,10 +351,10 @@ async def overwrite_cell(
         return "Notebook does not exist, please check if the notebook name is correct"
     
     async with notebook_manager.get_notebook_connection(notebook_name) as notebook:
-        if cell_index < 0 or cell_index >= len(notebook._doc._ycells):
-            return f"Cell index {cell_index} out of range, Notebook has {len(notebook._doc._ycells)} cells"
+        if cell_index < 0 or cell_index >= len(notebook):
+            return f"Cell index {cell_index} out of range, Notebook has {len(notebook)} cells"
         
-        raw_content = Cell(notebook._doc.get_cell(cell_index)).get_source()
+        raw_content = Cell(notebook[cell_index]).source
         notebook.set_cell_source(cell_index, cell_content)
         
         diff = difflib.unified_diff(raw_content.splitlines(keepends=False), cell_content.splitlines(keepends=False))
@@ -420,7 +395,7 @@ async def append_execute_code_cell(
                 kernel.interrupt()
             return [f"[TIMEOUT ERROR: Cell execution exceeded {timeout} seconds]"]
         
-        cell = Cell(notebook._doc.get_cell(cell_index))
+        cell = Cell(notebook[cell_index])
         
         return [f"Cell index {cell_index} execution successful!"] + cell.get_outputs()
 

@@ -52,11 +52,11 @@ def format_notebook(cells: list[Cell], start_index: int = 0, total_cells: int = 
     
     for relative_index, cell in enumerate(cells):
         actual_index = start_index + relative_index
-        if cell.get_type() == "code":
-            cell_header = f"=====Index: {actual_index}, Type: {cell.get_type()}, Execution Count: {cell.get_execution_count()}=====\n"
+        if cell.type == "code":
+            cell_header = f"=====Index: {actual_index}, Type: {cell.type}, Execution Count: {cell.execution_count}=====\n"
         else:
-            cell_header = f"=====Index: {actual_index}, Type: {cell.get_type()}=====\n"
-        result.append(cell_header+cell.get_source()+"\n\n")
+            cell_header = f"=====Index: {actual_index}, Type: {cell.type}=====\n"
+        result.append(cell_header+cell.source+"\n\n")
     return "\n".join(result)
 
 def list_cell_basic(notebook: NbModelClient, with_count: bool = False, start_index: int = 0, limit: int = 0) -> str:
@@ -73,8 +73,7 @@ def list_cell_basic(notebook: NbModelClient, with_count: bool = False, start_ind
     Returns:
         格式化的表格字符串 / The formatted table string
     """
-    ydoc = notebook._doc
-    total_cell = len(ydoc._ycells)
+    total_cell = len(notebook)
     
     if total_cell == 0:
         return "Notebook is empty, no Cell"
@@ -95,12 +94,10 @@ def list_cell_basic(notebook: NbModelClient, with_count: bool = False, start_ind
         pagination_info = f"Showing cells {start_index}-{end_index-1} of {total_cell} total cells\n\n"
     
     for i in range(start_index, end_index):
-        cell = Cell(ydoc.get_cell(i))
-        cell_type = cell.get_type()
-        execution_count = cell.get_execution_count()
-        content_list = cell.get_source().split("\n")
-        cell_content = content_list[0] + f"...({len(content_list)-1} lines hidden)" if len(content_list) > 1 else cell.get_source()
-        row = [i, cell_type, execution_count, cell_content] if with_count else [i, cell_type, cell_content]
+        cell = Cell(notebook[i])
+        content_list = cell.source.split("\n")
+        cell_content = content_list[0] + f"...({len(content_list)-1} lines hidden)" if len(content_list) > 1 else cell.source
+        row = [i, cell.type, cell.execution_count, cell_content] if with_count else [i, cell.type, cell_content]
         rows.append(row)
     
     table = format_table(headers, rows)
