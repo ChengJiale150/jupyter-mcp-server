@@ -72,7 +72,7 @@ async def connect_notebook(
     path = Path(notebook_path)
     try:
         # For relative paths starting with just filename, assume current directory
-        parent_path = str(path.parent) if str(path.parent) != "." else ""
+        parent_path = path.parent.as_posix() if path.parent.as_posix() != "." else ""
         
         if parent_path:
             dir_contents = server_client.contents.list_directory(parent_path)
@@ -85,7 +85,7 @@ async def connect_notebook(
             if not file_exists:
                 return f"'{notebook_path}' not found in jupyter server, please check the notebook already exists."
     except NotFoundError:
-        parent_dir = str(path.parent) if str(path.parent) != "." else "root directory"
+        parent_dir = path.parent.as_posix() if path.parent.as_posix() != "." else "root directory"
         return f"'{parent_dir}' not found in jupyter server, please check the directory path already exists."
     except Exception as e:
         return f"Failed to check the path '{notebook_path}': {e}"
