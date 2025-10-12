@@ -111,7 +111,7 @@ async def connect_notebook(
         server_url=server_url,
         token=token,
     )
-    kernel.start()
+    kernel.start(path=parent_path)
 
     # Try to connect to the notebook
     try:

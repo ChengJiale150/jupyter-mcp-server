@@ -4,7 +4,7 @@ Better Jupyter MCP Server
 A powerful MCP server for AI-driven Jupyter Notebook management and execution.
 """
 
-__version__ = "1.4.11"
+__version__ = "1.4.12"
 
 from .server import main
 
