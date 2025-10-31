@@ -1,4 +1,4 @@
-from better_jupyter_mcp_server import main
+from better_jupyter_mcp_server.server import mcp
 
 if __name__ == "__main__":
-    main()
+    mcp.run(transport="stdio")
